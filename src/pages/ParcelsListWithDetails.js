@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
-// Simulación de datos de parcelas existentes
+// Simulación de datos de parcelas existentes con el nuevo formato según la base de datos
 const parcelasExistentes = [
   {
     id: 1,
@@ -12,20 +12,19 @@ const parcelasExistentes = [
     longitud: '-70.123456',
     latitud: '-33.456789',
     ubicacion: 'Fundo El Olivo',
+    estado: 'Ocupada',
     superficie: 10,
     dim_longitud: 500,
     dim_anchura: 200,
     pendiente: 15,
-    siembras: [
-      {
-        nombre: 'Siembra 1',
-        tipo_uva: 'Chardonnay',
-      },
-      {
-        nombre: 'Siembra 2',
-        tipo_uva: 'Sauvignon Blanc',
-      },
-    ],
+    siembra_activa: {
+      tipo_uva: 'Chardonnay',
+      fecha_plantacion: '2023-04-15',
+      cantidad_plantas: 500,
+      tecnica: 'Siembra directa',
+      observaciones: 'Observaciones de la siembra...',
+      estado: 'Activa', // Estado de la siembra
+    },
     control_tierra: {
       ph: 6.5,
       humedad: 35,
@@ -39,16 +38,19 @@ const parcelasExistentes = [
     longitud: '-70.654321',
     latitud: '-33.123456',
     ubicacion: 'Fundo La Escondida',
+    estado: 'Ocupada',
     superficie: 8,
     dim_longitud: 400,
     dim_anchura: 150,
     pendiente: 12,
-    siembras: [
-      {
-        nombre: 'Siembra 3',
-        tipo_uva: 'Pinot Noir',
-      },
-    ],
+    siembra_activa: {
+      tipo_uva: 'Pinot Noir',
+      fecha_plantacion: '2023-06-10',
+      cantidad_plantas: 300,
+      tecnica: 'Trasplante',
+      observaciones: 'Observaciones de la siembra...',
+      estado: 'Finalizada', // Estado de la siembra
+    },
     control_tierra: {
       ph: 7,
       humedad: 40,
@@ -67,6 +69,11 @@ const ParcelsListWithDetails = () => {
       title: 'Nombre de la Parcela',
       dataIndex: 'nombre',
       key: 'nombre',
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'estado',
+      key: 'estado',
     },
     {
       title: 'Ubicación',
@@ -115,17 +122,16 @@ const ParcelsListWithDetails = () => {
           </Descriptions>
         </Panel>
 
-        {/* Acordeón para Siembras */}
-        <Panel header="Siembras Asociadas" key="2">
-          {parcela.siembras.map((siembra, index) => (
-            <Collapse key={index} bordered={false}>
-              <Panel header={siembra.nombre} key={index + 1}>
-                <Descriptions column={1} bordered>
-                  <Descriptions.Item label="Tipo de Uva">{siembra.tipo_uva}</Descriptions.Item>
-                </Descriptions>
-              </Panel>
-            </Collapse>
-          ))}
+        {/* Siembra Activa */}
+        <Panel header="Siembra Activa" key="2">
+          <Descriptions column={1} bordered>
+            <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
+            <Descriptions.Item label="Fecha de Plantación">{parcela.siembra_activa.fecha_plantacion}</Descriptions.Item>
+            <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa.cantidad_plantas}</Descriptions.Item>
+            <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa.tecnica}</Descriptions.Item>
+            <Descriptions.Item label="Estado de la Siembra">{parcela.siembra_activa.estado}</Descriptions.Item>
+            <Descriptions.Item label="Observaciones">{parcela.siembra_activa.observaciones}</Descriptions.Item>
+          </Descriptions>
         </Panel>
 
         {/* Acordeón para Control de Tierra */}
