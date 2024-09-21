@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, Button, Space, Collapse, Descriptions, Card } from 'antd';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons'; // Íconos
 import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
@@ -23,7 +24,7 @@ const parcelasExistentes = [
       cantidad_plantas: 500,
       tecnica: 'Siembra directa',
       observaciones: 'Observaciones de la siembra...',
-      estado: 'Activa', // Estado de la siembra
+      estado: 'Activa',
     },
     control_tierra: {
       ph: 6.5,
@@ -49,7 +50,7 @@ const parcelasExistentes = [
       cantidad_plantas: 300,
       tecnica: 'Trasplante',
       observaciones: 'Observaciones de la siembra...',
-      estado: 'Finalizada', // Estado de la siembra
+      estado: 'Finalizada',
     },
     control_tierra: {
       ph: 7,
@@ -108,12 +109,37 @@ const ParcelsListWithDetails = () => {
     navigate(`/edit-parcel/${id}`);
   };
 
+  const handleEditDimensions = (id) => {
+    navigate(`/edit-dimensions/${id}`);
+  };
+
+  const handleEditSiembra = (id) => {
+    navigate(`/edit-sowing/${id}`);
+  };
+
+  const handleCreateControlTierra = (id) => {
+    navigate(`/create-soil-control/${id}`);
+  };
+
   // Función para mostrar los detalles de cada parcela
   const expandedRowRender = (parcela) => {
     return (
       <Collapse accordion>
         {/* Acordeón para Dimensiones */}
-        <Panel header="Dimensiones" key="1">
+        <Panel
+          header="Dimensiones"
+          key="1"
+          extra={
+            <Button
+              type="default"
+              icon={<EditOutlined />}
+              style={{ color: '#1890ff' }}
+              onClick={() => handleEditDimensions(parcela.id)}
+            >
+              Editar
+            </Button>
+          }
+        >
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Superficie">{parcela.superficie} hectáreas</Descriptions.Item>
             <Descriptions.Item label="Longitud">{parcela.dim_longitud} metros</Descriptions.Item>
@@ -123,7 +149,20 @@ const ParcelsListWithDetails = () => {
         </Panel>
 
         {/* Siembra Activa */}
-        <Panel header="Siembra Activa" key="2">
+        <Panel
+          header="Siembra Activa"
+          key="2"
+          extra={
+            <Button
+              type="default"
+              icon={<EditOutlined />}
+              style={{ color: '#52c41a' }} // Verde para la siembra
+              onClick={() => handleEditSiembra(parcela.id)}
+            >
+              Editar
+            </Button>
+          }
+        >
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
             <Descriptions.Item label="Fecha de Plantación">{parcela.siembra_activa.fecha_plantacion}</Descriptions.Item>
@@ -135,7 +174,20 @@ const ParcelsListWithDetails = () => {
         </Panel>
 
         {/* Acordeón para Control de Tierra */}
-        <Panel header="Control de Tierra" key="3">
+        <Panel
+          header="Control de Tierra"
+          key="3"
+          extra={
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              style={{ backgroundColor: '#faad14', borderColor: '#faad14' }} // Naranja para crear control
+              onClick={() => handleCreateControlTierra(parcela.id)}
+            >
+              Crear
+            </Button>
+          }
+        >
           <Descriptions column={1} bordered>
             <Descriptions.Item label="PH de la Tierra">{parcela.control_tierra.ph}</Descriptions.Item>
             <Descriptions.Item label="Humedad">{parcela.control_tierra.humedad}%</Descriptions.Item>
