@@ -1,32 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Select, Descriptions, Input, message } from 'antd';
+import { Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse } from 'antd';
 import { useParams } from 'react-router-dom';
+
+const { Panel } = Collapse;
 
 // Simulación de datos de parcelas existentes
 const parcelasExistentes = [
   {
     id: 1,
     nombre: 'Parcela 1',
+    longitud: '123.456',
+    latitud: '456.789',
+    ubicacion: 'Valle de Casablanca',
+    estado: 'disponible',
     dimensionesActuales: {
       superficie: 10,
       longitud: 500,
       anchura: 200,
       pendiente: 15,
     },
-    siembras: [{ nombre: 'Siembra 1', tipoUva: 'Chardonnay' }],
-    tipoUva: 'Chardonnay',
+    ultimoControlTierra: {
+      ph: 6.5,
+      humedad: 35,
+      temperatura: 15,
+      observaciones: 'Condiciones normales',
+      fecha: '2023-07-14',
+    },
   },
   {
     id: 2,
     nombre: 'Parcela 2',
+    longitud: '123.456',
+    latitud: '456.789',
+    ubicacion: 'Valle de Casablanca',
+    estado: 'disponible',
     dimensionesActuales: {
       superficie: 8,
       longitud: 400,
       anchura: 150,
       pendiente: 12,
     },
-    siembras: [{ nombre: 'Siembra 2', tipoUva: 'Pinot Noir' }],
-    tipoUva: 'Pinot Noir',
+    ultimoControlTierra: {
+      ph: 6.8,
+      humedad: 38,
+      temperatura: 18,
+      observaciones: 'Condiciones óptimas',
+      fecha: '2023-06-28',
+    },
   },
 ];
 
@@ -97,17 +117,32 @@ const RegisterSoilControl = () => {
           </Form.Item>
         )}
 
-        {/* Mostrar detalles de la parcela seleccionada */}
+        {/* Acordeones para mostrar información de la parcela y el último control de tierra */}
         {selectedParcela && (
-          <Descriptions title="Detalles de la Parcela Seleccionada" bordered style={{ marginBottom: 20 }}>
-            <Descriptions.Item label="Superficie">{selectedParcela.dimensionesActuales.superficie} hectáreas</Descriptions.Item>
-            <Descriptions.Item label="Longitud">{selectedParcela.dimensionesActuales.longitud} metros</Descriptions.Item>
-            <Descriptions.Item label="Anchura">{selectedParcela.dimensionesActuales.anchura} metros</Descriptions.Item>
-            <Descriptions.Item label="Tipo de Uva">{selectedParcela.tipoUva}</Descriptions.Item>
-            <Descriptions.Item label="Siembra Actual">{selectedParcela.siembras[0].nombre}</Descriptions.Item>
-          </Descriptions>
+          <Collapse accordion style={{ marginBottom: 20 }}>
+            <Panel header="Información de la Parcela" key="1">
+              <Descriptions bordered column={1}>
+                <Descriptions.Item label="Nombre">{selectedParcela.nombre}</Descriptions.Item>
+                <Descriptions.Item label="Longitud (coordenadas)">{selectedParcela.longitud}</Descriptions.Item>
+                <Descriptions.Item label="Latitud (coordenadas)">{selectedParcela.latitud}</Descriptions.Item>
+                <Descriptions.Item label="Ubicación">{selectedParcela.ubicacion}</Descriptions.Item>
+                <Descriptions.Item label="Estado de la Parcela">{selectedParcela.estado}</Descriptions.Item>
+              </Descriptions>
+            </Panel>
+
+            <Panel header="Último Control de Tierra" key="2">
+              <Descriptions bordered column={1}>
+                <Descriptions.Item label="PH">{selectedParcela.ultimoControlTierra.ph}</Descriptions.Item>
+                <Descriptions.Item label="Humedad">{selectedParcela.ultimoControlTierra.humedad}%</Descriptions.Item>
+                <Descriptions.Item label="Temperatura">{selectedParcela.ultimoControlTierra.temperatura}°C</Descriptions.Item>
+                <Descriptions.Item label="Observaciones">{selectedParcela.ultimoControlTierra.observaciones}</Descriptions.Item>
+                <Descriptions.Item label="Fecha">{selectedParcela.ultimoControlTierra.fecha}</Descriptions.Item>
+              </Descriptions>
+            </Panel>
+          </Collapse>
         )}
 
+        {/* Campos del formulario para ingresar los datos del nuevo control de tierra */}
         <Form.Item
           label="PH de la Tierra"
           name="ph"
@@ -137,7 +172,7 @@ const RegisterSoilControl = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
             Registrar Control de Tierra
           </Button>
         </Form.Item>

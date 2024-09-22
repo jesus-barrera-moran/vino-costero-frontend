@@ -9,25 +9,31 @@ const parcelasExistentes = [
   {
     id: 1,
     nombre: 'Parcela 1',
+    longitud: '123.456',
+    latitud: '456.789',
+    ubicacion: 'Valle de Casablanca',
+    estado: 'disponible',
     dimensionesActuales: {
       superficie: 10,
       longitud: 500,
       anchura: 200,
       pendiente: 15,
     },
-    estado: 'disponible',
     siembras: [],
   },
   {
     id: 2,
     nombre: 'Parcela 2',
+    longitud: '123.456',
+    latitud: '456.789',
+    ubicacion: 'Valle de Casablanca',
+    estado: 'ocupada',
     dimensionesActuales: {
       superficie: 8,
       longitud: 400,
       anchura: 150,
       pendiente: 12,
     },
-    estado: 'ocupada',
     siembras: [
       {
         nombre: 'Siembra Actual',
@@ -115,6 +121,38 @@ const EditParcelDimensions = () => {
           onValuesChange={handleDimensionChange}
           style={{ marginBottom: 30 }}
         >
+
+          {tieneSiembraActiva && (
+            <Alert
+              message="No es posible editar las dimensiones de una parcela con siembra activa."
+              type="error"
+              showIcon
+              style={{ marginBottom: 30 }}
+            />
+          )}
+
+          {/* Acordeones para información adicional de la parcela */}
+          <Collapse accordion style={{ marginBottom: '10px' }}>
+            <Panel header="Información General de la Parcela" key="1">
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
+                <Descriptions.Item label="Longitud (coordenadas)">{parcela.longitud}</Descriptions.Item>
+                <Descriptions.Item label="Latitud (coordenadas)">{parcela.latitud}</Descriptions.Item>
+                <Descriptions.Item label="Ubicación">{parcela.ubicacion}</Descriptions.Item>
+                <Descriptions.Item label="Estado de la Parcela">{parcela.estado}</Descriptions.Item>
+              </Descriptions>
+            </Panel>
+
+            <Panel header="Dimensiones Actuales" key="2">
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Superficie">{parcela.dimensionesActuales.superficie} metros</Descriptions.Item>
+                <Descriptions.Item label="Longitud">{parcela.dimensionesActuales.longitud} metros</Descriptions.Item>
+                <Descriptions.Item label="Anchura">{parcela.dimensionesActuales.anchura} metros</Descriptions.Item>
+                <Descriptions.Item label="Pendiente">{parcela.dimensionesActuales.pendiente}%</Descriptions.Item>
+              </Descriptions>
+            </Panel>
+          </Collapse>
+
           <Form.Item
             label="Superficie (hectáreas)"
             name="superficie"
@@ -149,39 +187,8 @@ const EditParcelDimensions = () => {
 
           {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
 
-          {tieneSiembraActiva && (
-            <Alert
-              message="No es posible editar las dimensiones de una parcela con siembra activa."
-              type="error"
-              showIcon
-              style={{ marginBottom: 30 }}
-            />
-          )}
-
-          {/* Acordeones para información adicional de la parcela */}
-          <Collapse accordion>
-            <Panel header="Información General de la Parcela" key="1">
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
-                <Descriptions.Item label="Porcentaje Ocupado">{porcentajeOcupado}%</Descriptions.Item>
-                <Descriptions.Item label="Estado de la Parcela">
-                  {tieneSiembraActiva ? 'Ocupada (con siembra activa)' : 'Disponible'}
-                </Descriptions.Item>
-              </Descriptions>
-            </Panel>
-
-            <Panel header="Dimensiones Actuales" key="2">
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="Superficie">{parcela.dimensionesActuales.superficie} metros</Descriptions.Item>
-                <Descriptions.Item label="Longitud">{parcela.dimensionesActuales.longitud} metros</Descriptions.Item>
-                <Descriptions.Item label="Anchura">{parcela.dimensionesActuales.anchura} metros</Descriptions.Item>
-                <Descriptions.Item label="Pendiente">{parcela.dimensionesActuales.pendiente}%</Descriptions.Item>
-              </Descriptions>
-            </Panel>
-          </Collapse>
-
           <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px', marginTop: '10px' }}>
+            <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px' }}>
               Guardar Cambios
             </Button>
           </Form.Item>
