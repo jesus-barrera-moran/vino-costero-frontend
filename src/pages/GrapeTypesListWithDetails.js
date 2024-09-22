@@ -25,7 +25,9 @@ const tiposUvaExistentes = [
           pendiente: 15,
         },
         siembraActual: {
-          fechaSiembra: '2023-05-10',
+          cantidad_plantas: 150,
+          tecnica_siembra: 'Trasplante',
+          observaciones: 'Crecimiento óptimo',
         },
         controlTierra: {
           ph: 6.2,
@@ -44,7 +46,9 @@ const tiposUvaExistentes = [
           pendiente: 18,
         },
         siembraActual: {
-          fechaSiembra: '2023-04-15',
+          cantidad_plantas: 200,
+          tecnica_siembra: 'Siembra directa',
+          observaciones: 'Buen desarrollo',
         },
         controlTierra: {
           ph: 6.1,
@@ -74,7 +78,9 @@ const tiposUvaExistentes = [
           pendiente: 12,
         },
         siembraActual: {
-          fechaSiembra: '2023-06-20',
+          cantidad_plantas: 180,
+          tecnica_siembra: 'Trasplante',
+          observaciones: 'Crecimiento lento',
         },
         controlTierra: {
           ph: 6.5,
@@ -111,7 +117,7 @@ const GrapeTypeOverview = () => {
       title: 'Acciones',
       key: 'acciones',
       render: (record) => (
-        <Button type="primary" onClick={() => navigate(`/editar-tipo-uva/${record.id}`)}>
+        <Button type="primary" onClick={() => navigate(`/edit-grape-type/${record.id}`)}>
           Modificar
         </Button>
       ),
@@ -143,7 +149,9 @@ const GrapeTypeOverview = () => {
                 <Collapse accordion>
                   <Panel header="Siembra Activa" key={`siembra-${index}`}>
                     <Descriptions column={1} bordered>
-                      <Descriptions.Item label="Fecha de Siembra">{parcela.siembraActual.fechaSiembra}</Descriptions.Item>
+                      <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActual.cantidad_plantas}</Descriptions.Item>
+                      <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActual.tecnica_siembra}</Descriptions.Item>
+                      <Descriptions.Item label="Observaciones">{parcela.siembraActual.observaciones}</Descriptions.Item>
                     </Descriptions>
                   </Panel>
 
