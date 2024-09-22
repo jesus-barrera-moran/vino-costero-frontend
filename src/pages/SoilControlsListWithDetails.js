@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Card, Collapse, Descriptions, Timeline } from 'antd';
+import { Table, Card, Collapse, Descriptions, Timeline, Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
@@ -9,13 +9,12 @@ const parcelasExistentes = [
   {
     id: 1,
     nombre: 'Parcela 1',
-    dimensiones: {
-      superficie: 10,
-      longitud: 500,
-      anchura: 200,
-    },
-    siembraActual: {
-      tipoUva: 'Chardonnay',
+    ultimoControlTierra: {
+      ph: 6.5,
+      humedad: 35,
+      temperatura: 15,
+      observaciones: 'Condiciones normales',
+      fecha: '2023-07-14',
     },
     controlesTierra: [
       {
@@ -37,13 +36,12 @@ const parcelasExistentes = [
   {
     id: 2,
     nombre: 'Parcela 2',
-    dimensiones: {
-      superficie: 8,
-      longitud: 400,
-      anchura: 150,
-    },
-    siembraActual: {
-      tipoUva: 'Sauvignon Blanc',
+    ultimoControlTierra: {
+      ph: 6.8,
+      humedad: 38,
+      temperatura: 18,
+      observaciones: 'Condiciones óptimas',
+      fecha: '2023-06-28',
     },
     controlesTierra: [
       {
@@ -68,20 +66,25 @@ const ParcelSoilControlOverview = () => {
       key: 'nombre',
     },
     {
-      title: 'Superficie (ha)',
-      dataIndex: ['dimensiones', 'superficie'],
-      key: 'superficie',
+      title: 'Húmedad',
+      dataIndex: ['ultimoControlTierra', 'humedad'],
+      key: 'humedad',
     },
     {
-      title: 'Tipo de Uva Actual',
-      dataIndex: ['siembraActual', 'tipoUva'],
-      key: 'tipoUva',
+      title: 'Temperatura',
+      dataIndex: ['ultimoControlTierra', 'temperatura'],
+      key: 'temperatura',
     },
     {
       title: 'Acciones',
       key: 'acciones',
       render: (record) => (
-        <button onClick={() => navigate(`/crear-control-tierra/${record.id}`)}>Crear Control de Tierra</button>
+        <Button
+          type="primary"
+          onClick={() => navigate(`/create-soil-control/${record.id}`)}
+        >
+          Crear Control
+        </Button>
       ),
     },
   ];
@@ -92,12 +95,12 @@ const ParcelSoilControlOverview = () => {
       <Collapse accordion>
         {/* Último Control de Tierra */}
         <Panel header="Último Control de Tierra" key="1">
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="PH">{parcela.controlesTierra[0].ph}</Descriptions.Item>
-            <Descriptions.Item label="Humedad">{parcela.controlesTierra[0].humedad}%</Descriptions.Item>
-            <Descriptions.Item label="Temperatura">{parcela.controlesTierra[0].temperatura}°C</Descriptions.Item>
-            <Descriptions.Item label="Observaciones">{parcela.controlesTierra[0].observaciones}</Descriptions.Item>
-            <Descriptions.Item label="Fecha">{parcela.controlesTierra[0].fecha}</Descriptions.Item>
+          <Descriptions column={1} bordered>
+            <Descriptions.Item label="PH">{parcela.ultimoControlTierra.ph}</Descriptions.Item>
+            <Descriptions.Item label="Humedad">{parcela.ultimoControlTierra.humedad}%</Descriptions.Item>
+            <Descriptions.Item label="Temperatura">{parcela.ultimoControlTierra.temperatura}°C</Descriptions.Item>
+            <Descriptions.Item label="Observaciones">{parcela.ultimoControlTierra.observaciones}</Descriptions.Item>
+            <Descriptions.Item label="Fecha">{parcela.ultimoControlTierra.fecha}</Descriptions.Item>
           </Descriptions>
         </Panel>
 
