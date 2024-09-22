@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Card, message } from 'antd';
+import { Form, Input, Button, Select, Card, message, Switch } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -34,8 +34,11 @@ const CreateOrEditUser = () => {
           const usuario = response.data;
           form.setFieldsValue({
             nombre: usuario.nombre,
+            apellido: usuario.apellido,
             usuario: usuario.usuario,
             email: usuario.correo,
+            contrasena: usuario.contrasena,
+            habilitado: usuario.habilitado,
             rol: usuario.rol, // Cargar el rol actual desde la tabla usuario_roles
           });
         } catch (error) {
@@ -63,6 +66,15 @@ const CreateOrEditUser = () => {
     }
   };
 
+  const validatePasswordConfirmation = ({ getFieldValue }) => ({
+    validator(_, value) {
+      if (!value || getFieldValue('contrasena') === value) {
+        return Promise.resolve();
+      }
+      return Promise.reject(new Error('Las contraseñas no coinciden'));
+    },
+  });
+
   return (
     <Card title={isEditMode ? 'Modificar Usuario' : 'Registrar Nuevo Usuario'} bordered={false} style={{ marginTop: 20 }}>
       <Form form={form} layout="vertical" name="create-user" onFinish={onFinish}>
@@ -73,6 +85,15 @@ const CreateOrEditUser = () => {
           rules={[{ required: true, message: 'Por favor, ingrese el nombre del usuario' }]}
         >
           <Input placeholder="Nombre del Usuario" />
+        </Form.Item>
+
+        {/* Apellido */}
+        <Form.Item
+          label="Apellido"
+          name="apellido"
+          rules={[{ required: true, message: 'Por favor, ingrese el apellido del usuario' }]}
+        >
+          <Input placeholder="Apellido del Usuario" />
         </Form.Item>
 
         {/* Nombre de Usuario */}
@@ -91,6 +112,38 @@ const CreateOrEditUser = () => {
           rules={[{ required: true, message: 'Por favor, ingrese el correo electrónico' }]}
         >
           <Input placeholder="Correo Electrónico" />
+        </Form.Item>
+
+        {/* Contraseña */}
+        <Form.Item
+          label="Contraseña"
+          name="contrasena"
+          rules={[{ required: true, message: 'Por favor, ingrese una contraseña' }]}
+        >
+          <Input.Password placeholder="Contraseña" />
+        </Form.Item>
+
+        {/* Confirmar Contraseña */}
+        <Form.Item
+          label="Confirmar Contraseña"
+          name="confirmarContrasena"
+          dependencies={['contrasena']}
+          hasFeedback
+          rules={[
+            { required: true, message: 'Por favor, confirme su contraseña' },
+            validatePasswordConfirmation,
+          ]}
+        >
+          <Input.Password placeholder="Confirmar Contraseña" />
+        </Form.Item>
+
+        {/* Habilitado */}
+        <Form.Item
+          label="Habilitado"
+          name="habilitado"
+          valuePropName="checked"
+        >
+          <Switch defaultChecked />
         </Form.Item>
 
         {/* Rol */}
