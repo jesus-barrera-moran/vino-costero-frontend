@@ -24,7 +24,6 @@ const parcelasExistentes = [
       humedad: 35,
       temperatura: 15,
       observaciones: 'Condiciones normales',
-      fecha: '2023-07-14',
     },
   },
   {
@@ -45,7 +44,6 @@ const parcelasExistentes = [
       humedad: 38,
       temperatura: 18,
       observaciones: 'Condiciones óptimas',
-      fecha: '2023-06-28',
     },
   },
 ];
@@ -136,7 +134,6 @@ const RegisterSoilControl = () => {
                 <Descriptions.Item label="Humedad">{selectedParcela.ultimoControlTierra.humedad}%</Descriptions.Item>
                 <Descriptions.Item label="Temperatura">{selectedParcela.ultimoControlTierra.temperatura}°C</Descriptions.Item>
                 <Descriptions.Item label="Observaciones">{selectedParcela.ultimoControlTierra.observaciones}</Descriptions.Item>
-                <Descriptions.Item label="Fecha">{selectedParcela.ultimoControlTierra.fecha}</Descriptions.Item>
               </Descriptions>
             </Panel>
           </Collapse>

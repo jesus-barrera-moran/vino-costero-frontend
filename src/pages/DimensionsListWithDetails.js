@@ -14,6 +14,7 @@ const parcelasExistentes = [
       longitud: 500,   // En metros
       anchura: 200,    // En metros
       pendiente: 15,
+      fecha: '2023-05-01',
     },
     historialDimensiones: [
       {
@@ -40,6 +41,7 @@ const parcelasExistentes = [
       longitud: 400,  // En metros
       anchura: 150,   // En metros
       pendiente: 12,
+      fecha: '2023-04-15',
     },
     historialDimensiones: [],
   },
@@ -117,6 +119,7 @@ const ParcelDimensionsOverview = () => {
             <Descriptions.Item label="Longitud">{longitud} metros</Descriptions.Item>
             <Descriptions.Item label="Anchura">{anchura} metros</Descriptions.Item>
             <Descriptions.Item label="Pendiente">{parcela.dimensionesActuales.pendiente}%</Descriptions.Item>
+            <Descriptions.Item label="Fecha">{parcela.dimensionesActuales.fecha}</Descriptions.Item>
           </Descriptions>
         </Panel>
 

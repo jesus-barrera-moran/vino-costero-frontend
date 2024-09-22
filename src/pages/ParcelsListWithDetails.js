@@ -169,7 +169,6 @@ const ParcelsListWithDetails = () => {
         >
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
-            <Descriptions.Item label="Fecha de Plantación">{parcela.siembra_activa.fecha_plantacion}</Descriptions.Item>
             <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa.cantidad_plantas}</Descriptions.Item>
             <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa.tecnica}</Descriptions.Item>
             <Descriptions.Item label="Estado de la Siembra">{parcela.siembra_activa.estado}</Descriptions.Item>

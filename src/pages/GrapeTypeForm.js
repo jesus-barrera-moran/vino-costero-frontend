@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 const { Option } = Select;
 const { Panel } = Collapse;
 
-// Simulación de datos de parcelas
+// Simulación de datos de parcelas con siembras activas
 const parcelasExistentes = [
   {
     id: 1,
@@ -22,6 +22,12 @@ const parcelasExistentes = [
       temperatura: 18,
       observaciones: 'Condiciones normales',
     },
+    siembraActiva: {
+      fechaPlantacion: '2023-05-10',
+      cantidadPlantas: 1000,
+      tecnica: 'Siembra directa',
+      observaciones: 'Observaciones de la siembra...',
+    },
   },
   {
     id: 2,
@@ -37,6 +43,12 @@ const parcelasExistentes = [
       humedad: 36,
       temperatura: 19,
       observaciones: 'Condiciones óptimas',
+    },
+    siembraActiva: {
+      fechaPlantacion: '2023-04-20',
+      cantidadPlantas: 1200,
+      tecnica: 'Trasplante',
+      observaciones: 'Observaciones de la siembra...',
     },
   },
 ];
@@ -94,7 +106,7 @@ const CreateOrEditGrapeType = () => {
     navigate('/');
   };
 
-  // Función para renderizar los acordeones con la información de las parcelas
+  // Función para renderizar los acordeones con la información de las parcelas y siembras activas
   const renderParcelDetails = (parcelaId) => {
     const parcela = parcelasExistentes.find((p) => p.id === parcelaId);
     if (parcela) {
@@ -121,6 +133,17 @@ const CreateOrEditGrapeType = () => {
                   <Descriptions.Item label="Observaciones">{parcela.controlTierra.observaciones}</Descriptions.Item>
                 </Descriptions>
               </Panel>
+
+              {/* Acordeón para la Siembra Activa */}
+              {parcela.siembraActiva && (
+                <Panel header="Siembra Activa" key={`siembra-${parcela.id}`}>
+                  <Descriptions column={1} bordered>
+                    <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActiva.cantidadPlantas}</Descriptions.Item>
+                    <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActiva.tecnica}</Descriptions.Item>
+                    <Descriptions.Item label="Observaciones">{parcela.siembraActiva.observaciones}</Descriptions.Item>
+                  </Descriptions>
+                </Panel>
+              )}
             </Collapse>
           </Panel>
         </Collapse>
@@ -136,13 +159,13 @@ const CreateOrEditGrapeType = () => {
         <Form.Item
           label="Seleccionar Parcelas"
           name="parcelas"
-          rules={[{ required: true, message: 'Por favor, seleccione al menos una parcela' }]}
         >
           <Select
             mode="multiple"
             placeholder="Seleccione las parcelas"
             defaultValue={selectedParcels}
             onChange={setSelectedParcels}
+            disabled={isEditMode}
           >
             {parcelasExistentes.map((parcela) => (
               <Option key={parcela.id} value={parcela.id}>
