@@ -68,7 +68,10 @@ function App() {
         <Route path="/edit-sowing/:id" element={<SowingForm />} />
 
         {/* Ruta para la creación de siembras */}
-        <Route path="/create-sowing:id" element={<SowingForm />} />
+        <Route path="/create-sowing" element={<SowingForm />} />
+
+        {/* Ruta para la creación de siembras */}
+        <Route path="/create-sowing/:id" element={<SowingForm />} />
 
       </Routes>
     </Router>

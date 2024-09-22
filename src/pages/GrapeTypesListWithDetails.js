@@ -185,6 +185,9 @@ const GrapeTypeOverview = () => {
 
   return (
     <Card title="Gestión de Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-grape-type')}>
+        Registrar Nuevo Tipo de Uva 
+      </Button>
       <Table
         columns={columns}
         dataSource={tiposUvaExistentes}

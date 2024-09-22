@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Select, DatePicker, Input, Descriptions, message } from 'antd';
+import { Form, InputNumber, Button, Card, Select, DatePicker, Input, Descriptions, message, Collapse } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 
 const { Option } = Select;
+const { Panel } = Collapse;
 
 // Simulación de datos de parcelas existentes
 const parcelasExistentes = [
@@ -14,11 +15,13 @@ const parcelasExistentes = [
       superficie: 10,
       longitud: 500,
       anchura: 200,
+      pendiente: 5,
     },
     controlesTierra: {
       ph: 6.2,
       humedad: 32,
       temperatura: 18,
+      observaciones: 'Se realizó un control de tierra el 2023-05-01.',
     },
   },
   {
@@ -28,11 +31,13 @@ const parcelasExistentes = [
       superficie: 8,
       longitud: 400,
       anchura: 150,
+      pendiente: 5,
     },
     controlesTierra: {
       ph: 6.5,
       humedad: 35,
       temperatura: 19,
+      observaciones: 'Se realizó un control de tierra el 2023-04-15.',
     },
   },
 ];
@@ -109,6 +114,7 @@ const CreateSowing = () => {
   return (
     <Card title={isEditMode ? 'Modificar Siembra' : 'Registrar Nueva Siembra'} bordered={false} style={{ marginTop: 20 }}>
       <Form form={form} layout="vertical" name="create-sowing" onFinish={onFinish}>
+
         {/* Selección de Parcela */}
         <Form.Item
           label="Seleccione Parcela"
@@ -128,27 +134,40 @@ const CreateSowing = () => {
           </Select>
         </Form.Item>
 
-        {/* Mostrar detalles de la parcela seleccionada */}
+        {/* Acordeones para la información de la parcela seleccionada */}
         {selectedParcela && (
-          <Descriptions title="Detalles de la Parcela Seleccionada" bordered column={1}>
-            <Descriptions.Item label="Superficie">
-              {selectedParcela.dimensiones.superficie} hectáreas
-            </Descriptions.Item>
-            <Descriptions.Item label="Longitud">{selectedParcela.dimensiones.longitud} metros</Descriptions.Item>
-            <Descriptions.Item label="Anchura">{selectedParcela.dimensiones.anchura} metros</Descriptions.Item>
-            <Descriptions.Item label="PH del Suelo">{selectedParcela.controlesTierra.ph}</Descriptions.Item>
-            <Descriptions.Item label="Humedad del Suelo">{selectedParcela.controlesTierra.humedad}%</Descriptions.Item>
-            <Descriptions.Item label="Temperatura del Suelo">
-              {selectedParcela.controlesTierra.temperatura}°C
-            </Descriptions.Item>
-          </Descriptions>
+          <Collapse accordion style={{ marginBottom: '20px' }}>
+            <Panel header={`Detalles de la Parcela: ${selectedParcela.nombre}`} key="1">
+              <Collapse accordion>
+                {/* Acordeón para Dimensiones */}
+                <Panel header="Dimensiones" key="dimensiones">
+                  <Descriptions column={2} bordered>
+                    <Descriptions.Item label="Superficie">{selectedParcela.dimensiones.superficie} hectáreas</Descriptions.Item>
+                    <Descriptions.Item label="Longitud">{selectedParcela.dimensiones.longitud} metros</Descriptions.Item>
+                    <Descriptions.Item label="Anchura">{selectedParcela.dimensiones.anchura} metros</Descriptions.Item>
+                    <Descriptions.Item label="Pendiente">{selectedParcela.dimensiones.pendiente}%</Descriptions.Item>
+                  </Descriptions>
+                </Panel>
+
+                {/* Acordeón para Control de Tierra */}
+                <Panel header="Último Control de Tierra" key="controlTierra">
+                  <Descriptions column={2} bordered>
+                    <Descriptions.Item label="PH del Suelo">{selectedParcela.controlesTierra.ph}</Descriptions.Item>
+                    <Descriptions.Item label="Humedad">{selectedParcela.controlesTierra.humedad}%</Descriptions.Item>
+                    <Descriptions.Item label="Temperatura">{selectedParcela.controlesTierra.temperatura}°C</Descriptions.Item>
+                    <Descriptions.Item label="Observaciones">{selectedParcela.controlesTierra.observaciones}</Descriptions.Item>
+                  </Descriptions>
+                </Panel>
+              </Collapse>
+            </Panel>
+          </Collapse>
         )}
 
         {/* Tipo de Uva */}
         <Form.Item
           label="Tipo de Uva"
           name="tipoUva"
-          rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
+          // rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
         >
           <Select placeholder="Seleccione el tipo de uva">
             {tiposDeUva.map((uva, index) => (
@@ -187,7 +206,7 @@ const CreateSowing = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
             {isEditMode ? 'Guardar Cambios' : 'Registrar Siembra'}
           </Button>
         </Form.Item>
