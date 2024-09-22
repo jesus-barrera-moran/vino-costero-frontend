@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, InputNumber, Button, Card, Select, Descriptions, Input, message } from 'antd';
+import { useParams } from 'react-router-dom';
 
 // Simulación de datos de parcelas existentes
 const parcelasExistentes = [
@@ -32,8 +33,19 @@ const parcelasExistentes = [
 const RegisterSoilControl = () => {
   const [form] = Form.useForm();
   const [selectedParcela, setSelectedParcela] = useState(null);
+  const { id } = useParams(); // Capturar ID si venimos desde el botón "Crear Control" específico de una parcela
 
-  // Manejar el cambio de parcela seleccionada
+  // Preseleccionar la parcela si venimos desde una específica
+  useEffect(() => {
+    if (id) {
+      const parcela = parcelasExistentes.find((p) => p.id === parseInt(id));
+      if (parcela) {
+        setSelectedParcela(parcela);
+      }
+    }
+  }, [id]);
+
+  // Manejar el cambio de parcela seleccionada (cuando es general)
   const handleParcelaChange = (value) => {
     const parcela = parcelasExistentes.find((p) => p.id === value);
     setSelectedParcela(parcela);
@@ -65,23 +77,27 @@ const RegisterSoilControl = () => {
         name="register-soil-control"
         onFinish={onFinish}
       >
-        <Form.Item
-          label="Seleccionar Parcela"
-          name="parcela"
-          rules={[{ required: true, message: 'Por favor, seleccione una parcela' }]}
-        >
-          <Select
-            placeholder="Seleccione una parcela"
-            onChange={handleParcelaChange}
+        {/* Seleccionar parcela solo si no venimos desde una parcela específica */}
+        {!id && (
+          <Form.Item
+            label="Seleccionar Parcela"
+            name="parcela"
+            rules={[{ required: true, message: 'Por favor, seleccione una parcela' }]}
           >
-            {parcelasExistentes.map((parcela) => (
-              <Select.Option key={parcela.id} value={parcela.id}>
-                {parcela.nombre}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
+            <Select
+              placeholder="Seleccione una parcela"
+              onChange={handleParcelaChange}
+            >
+              {parcelasExistentes.map((parcela) => (
+                <Select.Option key={parcela.id} value={parcela.id}>
+                  {parcela.nombre}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
+        {/* Mostrar detalles de la parcela seleccionada */}
         {selectedParcela && (
           <Descriptions title="Detalles de la Parcela Seleccionada" bordered style={{ marginBottom: 20 }}>
             <Descriptions.Item label="Superficie">{selectedParcela.dimensionesActuales.superficie} hectáreas</Descriptions.Item>
@@ -117,7 +133,6 @@ const RegisterSoilControl = () => {
         </Form.Item>
 
         <Form.Item label="Observaciones" name="observaciones">
-          {/* Aquí cambiamos a Input.TextArea en lugar de InputNumber.TextArea */}
           <Input.TextArea placeholder="Ingrese observaciones" rows={4} />
         </Form.Item>
 

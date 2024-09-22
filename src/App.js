@@ -47,6 +47,9 @@ function App() {
         <Route path="/soil-controls" element={<SoilControlsListWithDetails />} />
 
         {/* Ruta para la creación de controles de tierra */}
+        <Route path="/create-soil-control" element={<SoilControlForm />} />
+
+        {/* Ruta para la edición de controles de tierra */}
         <Route path="/create-soil-control/:id" element={<SoilControlForm />} />
 
         {/* Ruta para la visualización de tipos de uva */}

@@ -129,6 +129,9 @@ const ParcelSoilControlOverview = () => {
 
   return (
     <Card title="Visualización de Parcelas y Controles de Tierra" bordered={false} style={{ marginTop: 20 }}>
+      <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-soil-control')}>
+        Crear Control de Tierra
+      </Button>
       <Table
         columns={columns}
         dataSource={parcelasExistentes}
