@@ -14,10 +14,12 @@ const parcelasExistentes = [
     latitud: '-33.456789',
     ubicacion: 'Fundo El Olivo',
     estado: 'Ocupada',
-    superficie: 10,
-    dim_longitud: 500,
-    dim_anchura: 200,
-    pendiente: 15,
+    dimensiones: {
+      superficie: 10,
+      longitud: 500,
+      anchura: 200,
+      pendiente: 15,
+    },
     siembra_activa: {
       tipo_uva: 'Chardonnay',
       fecha_plantacion: '2023-04-15',
@@ -40,10 +42,12 @@ const parcelasExistentes = [
     latitud: '-33.123456',
     ubicacion: 'Fundo La Escondida',
     estado: 'Ocupada',
-    superficie: 8,
-    dim_longitud: 400,
-    dim_anchura: 150,
-    pendiente: 12,
+    dimensiones: {
+      superficie: 8,
+      longitud: 400,
+      anchura: 150,
+      pendiente: 12,
+    },
     siembra_activa: {
       tipo_uva: 'Pinot Noir',
       fecha_plantacion: '2023-06-10',
@@ -82,14 +86,14 @@ const ParcelsListWithDetails = () => {
       key: 'ubicacion',
     },
     {
-      title: 'Superficie (ha)',
-      dataIndex: 'superficie',
-      key: 'superficie',
+      title: 'Longitud',
+      dataIndex: 'longitud',
+      key: 'longitud',
     },
     {
-      title: 'Pendiente (%)',
-      dataIndex: 'pendiente',
-      key: 'pendiente',
+      title: 'Latituda',
+      dataIndex: 'latitud',
+      key: 'latitud',
     },
     {
       title: 'Acciones',
@@ -141,10 +145,10 @@ const ParcelsListWithDetails = () => {
           }
         >
           <Descriptions column={1} bordered>
-            <Descriptions.Item label="Superficie">{parcela.superficie} hectáreas</Descriptions.Item>
-            <Descriptions.Item label="Longitud">{parcela.dim_longitud} metros</Descriptions.Item>
-            <Descriptions.Item label="Anchura">{parcela.dim_anchura} metros</Descriptions.Item>
-            <Descriptions.Item label="Pendiente">{parcela.pendiente}%</Descriptions.Item>
+            <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
+            <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
+            <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
+            <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
           </Descriptions>
         </Panel>
 
