@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Descriptions, message, Alert } from 'antd';
+import { Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
+
+const { Panel } = Collapse;
 
 // Simulación de datos de parcelas existentes
 const parcelasExistentes = [
@@ -70,7 +72,7 @@ const EditParcelDimensions = () => {
   }, [id, form]);
 
   // Función para manejar los cambios en las dimensiones
-  const handleDimensionChange = (changedValues) => {
+  const handleDimensionChange = () => {
     const { longitud, anchura } = form.getFieldsValue(['longitud', 'anchura']);
     if (longitud && anchura) {
       const area = calcularAreaOcupada(longitud, anchura);
@@ -102,32 +104,16 @@ const EditParcelDimensions = () => {
   const tieneSiembraActiva = parcela.siembras.length > 0;
 
   return (
-    <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20 }}>
-      <Descriptions column={2} bordered style={{ marginBottom: 20 }}>
-        <Descriptions.Item label="Superficie Total">{parcela.dimensionesActuales.superficie} hectáreas</Descriptions.Item>
-        <Descriptions.Item label="Área Ocupada">{areaOcupada.toFixed(2)} hectáreas</Descriptions.Item>
-        <Descriptions.Item label="Porcentaje Ocupado">{porcentajeOcupado}%</Descriptions.Item>
-        <Descriptions.Item label="Estado de la Parcela">
-          {tieneSiembraActiva ? 'Ocupada (con siembra activa)' : 'Disponible'}
-        </Descriptions.Item>
-      </Descriptions>
-
-      {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
-
-      {tieneSiembraActiva ? (
-        <Alert
-          message="No es posible editar las dimensiones de una parcela con siembra activa."
-          type="error"
-          showIcon
-          style={{ marginBottom: 20 }}
-        />
-      ) : (
+    <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, padding: '20px 40px' }}>
+      {/* Formulario para editar dimensiones */}
+      {!tieneSiembraActiva && (
         <Form
           form={form}
           layout="vertical"
           name="edit-dimensions"
           onFinish={onFinish}
           onValuesChange={handleDimensionChange}
+          style={{ marginBottom: 30 }}
         >
           <Form.Item
             label="Superficie (hectáreas)"
@@ -161,8 +147,41 @@ const EditParcelDimensions = () => {
             <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
           </Form.Item>
 
+          {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
+
+          {tieneSiembraActiva && (
+            <Alert
+              message="No es posible editar las dimensiones de una parcela con siembra activa."
+              type="error"
+              showIcon
+              style={{ marginBottom: 30 }}
+            />
+          )}
+
+          {/* Acordeones para información adicional de la parcela */}
+          <Collapse accordion>
+            <Panel header="Información General de la Parcela" key="1">
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
+                <Descriptions.Item label="Porcentaje Ocupado">{porcentajeOcupado}%</Descriptions.Item>
+                <Descriptions.Item label="Estado de la Parcela">
+                  {tieneSiembraActiva ? 'Ocupada (con siembra activa)' : 'Disponible'}
+                </Descriptions.Item>
+              </Descriptions>
+            </Panel>
+
+            <Panel header="Dimensiones Actuales" key="2">
+              <Descriptions column={1} bordered>
+                <Descriptions.Item label="Superficie">{parcela.dimensionesActuales.superficie} metros</Descriptions.Item>
+                <Descriptions.Item label="Longitud">{parcela.dimensionesActuales.longitud} metros</Descriptions.Item>
+                <Descriptions.Item label="Anchura">{parcela.dimensionesActuales.anchura} metros</Descriptions.Item>
+                <Descriptions.Item label="Pendiente">{parcela.dimensionesActuales.pendiente}%</Descriptions.Item>
+              </Descriptions>
+            </Panel>
+          </Collapse>
+
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px', marginTop: '10px' }}>
               Guardar Cambios
             </Button>
           </Form.Item>
