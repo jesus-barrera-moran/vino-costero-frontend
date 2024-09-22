@@ -1,15 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, InputNumber, Button, Card, Select, message } from 'antd';
+import { Form, Input, InputNumber, Button, Card, Select, message, Collapse, Descriptions } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const { Option } = Select;
+const { Panel } = Collapse;
 
 // Simulación de datos de parcelas
 const parcelasExistentes = [
-  { id: 1, nombre: 'Parcela 1' },
-  { id: 2, nombre: 'Parcela 2' },
+  {
+    id: 1,
+    nombre: 'Parcela 1',
+    dimensiones: {
+      superficie: 10,
+      longitud: 500,
+      anchura: 200,
+      pendiente: 15,
+    },
+    controlTierra: {
+      ph: 6.2,
+      humedad: 32,
+      temperatura: 18,
+      observaciones: 'Condiciones normales',
+    },
+  },
+  {
+    id: 2,
+    nombre: 'Parcela 2',
+    dimensiones: {
+      superficie: 12,
+      longitud: 600,
+      anchura: 250,
+      pendiente: 18,
+    },
+    controlTierra: {
+      ph: 6.5,
+      humedad: 36,
+      temperatura: 19,
+      observaciones: 'Condiciones óptimas',
+    },
+  },
 ];
 
+// Simulación de datos de tipos de uva existentes
 const tiposUvaExistentes = [
   {
     id: 1,
@@ -62,9 +94,71 @@ const CreateOrEditGrapeType = () => {
     navigate('/');
   };
 
+  // Función para renderizar los acordeones con la información de las parcelas
+  const renderParcelDetails = (parcelaId) => {
+    const parcela = parcelasExistentes.find((p) => p.id === parcelaId);
+    if (parcela) {
+      return (
+        <Collapse accordion key={parcela.id} style={{ marginBottom: '10px' }}>
+          <Panel header={`Parcela: ${parcela.nombre}`} key={`parcela-${parcela.id}`}>
+            <Collapse accordion>
+              {/* Acordeón para las Dimensiones */}
+              <Panel header="Dimensiones" key={`dimensiones-${parcela.id}`}>
+                <Descriptions column={2} bordered>
+                  <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
+                  <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
+                  <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
+                  <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
+                </Descriptions>
+              </Panel>
+
+              {/* Acordeón para el Último Control de Tierra */}
+              <Panel header="Último Control de Tierra" key={`controlTierra-${parcela.id}`}>
+                <Descriptions column={2} bordered>
+                  <Descriptions.Item label="PH del Suelo">{parcela.controlTierra.ph}</Descriptions.Item>
+                  <Descriptions.Item label="Humedad">{parcela.controlTierra.humedad}%</Descriptions.Item>
+                  <Descriptions.Item label="Temperatura">{parcela.controlTierra.temperatura}°C</Descriptions.Item>
+                  <Descriptions.Item label="Observaciones">{parcela.controlTierra.observaciones}</Descriptions.Item>
+                </Descriptions>
+              </Panel>
+            </Collapse>
+          </Panel>
+        </Collapse>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20 }}>
       <Form form={form} layout="vertical" name="create-edit-grape-type" onFinish={onFinish}>
+        {/* Selección de Parcelas */}
+        <Form.Item
+          label="Seleccionar Parcelas"
+          name="parcelas"
+          rules={[{ required: true, message: 'Por favor, seleccione al menos una parcela' }]}
+        >
+          <Select
+            mode="multiple"
+            placeholder="Seleccione las parcelas"
+            defaultValue={selectedParcels}
+            onChange={setSelectedParcels}
+          >
+            {parcelasExistentes.map((parcela) => (
+              <Option key={parcela.id} value={parcela.id}>
+                {parcela.nombre}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        {/* Acordeones para las parcelas seleccionadas */}
+        {selectedParcels.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            {selectedParcels.map((parcelaId) => renderParcelDetails(parcelaId))}
+          </div>
+        )}
+
         <Form.Item
           label="Nombre de la Uva"
           name="nombre"
@@ -111,26 +205,6 @@ const CreateOrEditGrapeType = () => {
           rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}
         >
           <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
-        </Form.Item>
-
-        {/* Selección de Parcelas */}
-        <Form.Item
-          label="Seleccionar Parcelas"
-          name="parcelas"
-          rules={[{ required: false }]}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Seleccione las parcelas"
-            defaultValue={selectedParcels}
-            onChange={setSelectedParcels}
-          >
-            {parcelasExistentes.map((parcela) => (
-              <Option key={parcela.id} value={parcela.id}>
-                {parcela.nombre}
-              </Option>
-            ))}
-          </Select>
         </Form.Item>
 
         <Form.Item>
