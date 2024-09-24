@@ -49,19 +49,23 @@ const tiposDeUva = ['Chardonnay', 'Sauvignon Blanc', 'Pinot Noir', 'Cabernet Sau
 const siembrasExistentes = [
   {
     id: 1,
-    parcelaId: 1,
-    tipoUva: 'Chardonnay',
-    fechaPlantacion: '2023-05-01',
-    cantidadPlantas: 1000,
-    tecnica: 'Siembra directa',
+    id_parcela: 1,
+    tipo_uva: 'Chardonnay',
+    estado: 'Activa',
+    fecha_plantacion: '2023-05-01',
+    cantidad_plantas: 1000,
+    tecnica_siembra: 'Siembra directa',
+    observaciones_siembra: 'Observaciones de la siembra...',
   },
   {
     id: 2,
-    parcelaId: 2,
-    tipoUva: 'Sauvignon Blanc',
-    fechaPlantacion: '2023-04-15',
-    cantidadPlantas: 900,
-    tecnica: 'Trasplante',
+    id_parcela: 2,
+    tipo_uva: 'Sauvignon Blanc',
+    estado: 'Activa',
+    fecha_plantacion: '2023-04-15',
+    cantidad_plantas: 900,
+    tecnica_siembra: 'Trasplante',
+    observaciones_siembra: 'Observaciones de la siembra...',
   },
 ];
 
@@ -80,21 +84,21 @@ const CreateSowing = () => {
       const siembra = siembrasExistentes.find((s) => s.id === parseInt(id));
       if (siembra) {
         // Seleccionar la parcela correspondiente
-        handleParcelaChange(siembra.parcelaId);
+        handleParcelaChange(siembra.id_parcela);
         // Cargar los datos en el formulario
         form.setFieldsValue({
-          parcela: siembra.parcelaId,
-          tipoUva: siembra.tipoUva,
-          fechaPlantacion: moment(siembra.fechaPlantacion),
-          cantidadPlantas: siembra.cantidadPlantas,
-          tecnica: siembra.tecnica,
+          parcela: siembra.id_parcela,
+          tipo_uva: siembra.tipo_uva,
+          fecha_plantacion: moment(siembra.fecha_plantacion),
+          cantidad_plantas: siembra.cantidad_plantas,
+          tecnica_siembra: siembra.tecnica_siembra,
         });
       }
     }
   }, [id, form]);
 
-  const handleParcelaChange = (parcelaId) => {
-    const parcela = parcelasExistentes.find((p) => p.id === parseInt(parcelaId));
+  const handleParcelaChange = (id_parcela) => {
+    const parcela = parcelasExistentes.find((p) => p.id === parseInt(id_parcela));
     setSelectedParcela(parcela);
   };
 
@@ -166,7 +170,7 @@ const CreateSowing = () => {
         {/* Tipo de Uva */}
         <Form.Item
           label="Tipo de Uva"
-          name="tipoUva"
+          name="tipo_uva"
           // rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
         >
           <Select placeholder="Seleccione el tipo de uva">
@@ -181,7 +185,7 @@ const CreateSowing = () => {
         {/* Fecha de Plantación */}
         <Form.Item
           label="Fecha de Plantación"
-          name="fechaPlantacion"
+          name="fecha_plantacion"
           rules={[{ required: true, message: 'Por favor, seleccione la fecha de plantación' }]}
         >
           <DatePicker style={{ width: '100%' }} />
@@ -190,7 +194,7 @@ const CreateSowing = () => {
         {/* Cantidad de Plantas */}
         <Form.Item
           label="Cantidad de Plantas"
-          name="cantidadPlantas"
+          name="cantidad_plantas"
           rules={[{ required: true, message: 'Por favor, ingrese la cantidad de plantas' }]}
         >
           <InputNumber min={1} placeholder="Cantidad de Plantas" style={{ width: '100%' }} />
@@ -199,7 +203,7 @@ const CreateSowing = () => {
         {/* Técnica de Siembra */}
         <Form.Item
           label="Técnica de Siembra"
-          name="tecnica"
+          name="tecnica_siembra"
           rules={[{ required: true, message: 'Por favor, ingrese la técnica de siembra utilizada' }]}
         >
           <Input placeholder="Técnica de Siembra (Ej: Siembra directa, Trasplante)" />
