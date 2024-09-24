@@ -10,12 +10,6 @@ const parcelasExistentes = [
   {
     id: 1,
     nombre: 'Parcela 1',
-    dimensiones: {
-      superficie: 10,
-      longitud: 500,
-      anchura: 200,
-      pendiente: 5,
-    },
     siembraActual: {
       tipoUva: 'Chardonnay',
       fechaCreacion: '2023-05-01',
@@ -36,12 +30,6 @@ const parcelasExistentes = [
   {
     id: 2,
     nombre: 'Parcela 2',
-    dimensiones: {
-      superficie: 8,
-      longitud: 400,
-      anchura: 150,
-      pendiente: 5,
-    },
     siembraActual: {
       tipoUva: 'Sauvignon Blanc',
       fechaCreacion: '2023-04-15',

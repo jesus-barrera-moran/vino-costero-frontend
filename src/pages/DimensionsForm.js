@@ -13,13 +13,13 @@ const parcelasExistentes = [
     latitud: '456.789',
     ubicacion: 'Valle de Casablanca',
     estado: 'disponible',
-    dimensionesActuales: {
+    dimensiones: {
       superficie: 10,
       longitud: 500,
       anchura: 200,
       pendiente: 15,
     },
-    siembras: [],
+    siembra_activa: null,
   },
   {
     id: 2,
@@ -28,18 +28,17 @@ const parcelasExistentes = [
     latitud: '456.789',
     ubicacion: 'Valle de Casablanca',
     estado: 'ocupada',
-    dimensionesActuales: {
+    dimensiones: {
       superficie: 8,
       longitud: 400,
       anchura: 150,
       pendiente: 12,
     },
-    siembras: [
-      {
-        nombre: 'Siembra Actual',
-        tipoUva: 'Pinot Noir',
-      },
-    ],
+    siembra_activa: {
+      estado: 'activa',
+      nombre: 'Siembra Actual',
+      tipoUva: 'Pinot Noir',
+    },
   },
 ];
 
@@ -62,7 +61,7 @@ const EditParcelDimensions = () => {
     const selectedParcela = parcelasExistentes.find((p) => p.id === parseInt(id));
     if (selectedParcela) {
       setParcela(selectedParcela);
-      const { longitud, anchura, superficie } = selectedParcela.dimensionesActuales;
+      const { longitud, anchura, superficie } = selectedParcela.dimensiones;
       const area = calcularAreaOcupada(longitud, anchura);
       setAreaOcupada(area);
       setPorcentajeOcupado(((area / superficie) * 100).toFixed(2));
@@ -70,7 +69,7 @@ const EditParcelDimensions = () => {
         superficie: superficie,
         longitud: longitud,
         anchura: anchura,
-        pendiente: selectedParcela.dimensionesActuales.pendiente,
+        pendiente: selectedParcela.dimensiones.pendiente,
       });
     } else {
       message.error('Parcela no encontrada');
@@ -107,12 +106,12 @@ const EditParcelDimensions = () => {
   }
 
   // Validación: Si la parcela tiene una siembra activa, no permitimos la edición
-  const tieneSiembraActiva = parcela.siembras.length > 0;
+  const tieneSiembraActiva = parcela.siembra_activa && parcela.siembra_activa.estado === 'activa';
 
   return (
     <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, padding: '20px 40px' }}>
       {/* Formulario para editar dimensiones */}
-      {!tieneSiembraActiva && (
+      {
         <Form
           form={form}
           layout="vertical"
@@ -120,6 +119,7 @@ const EditParcelDimensions = () => {
           onFinish={onFinish}
           onValuesChange={handleDimensionChange}
           style={{ marginBottom: 30 }}
+          disabled={tieneSiembraActiva}
         >
 
           {tieneSiembraActiva && (
@@ -145,10 +145,10 @@ const EditParcelDimensions = () => {
 
             <Panel header="Dimensiones Actuales" key="2">
               <Descriptions column={1} bordered>
-                <Descriptions.Item label="Superficie">{parcela.dimensionesActuales.superficie} metros</Descriptions.Item>
-                <Descriptions.Item label="Longitud">{parcela.dimensionesActuales.longitud} metros</Descriptions.Item>
-                <Descriptions.Item label="Anchura">{parcela.dimensionesActuales.anchura} metros</Descriptions.Item>
-                <Descriptions.Item label="Pendiente">{parcela.dimensionesActuales.pendiente}%</Descriptions.Item>
+                <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} metros</Descriptions.Item>
+                <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
+                <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
+                <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
               </Descriptions>
             </Panel>
           </Collapse>
@@ -193,7 +193,7 @@ const EditParcelDimensions = () => {
             </Button>
           </Form.Item>
         </Form>
-      )}
+      }
     </Card>
   );
 };
