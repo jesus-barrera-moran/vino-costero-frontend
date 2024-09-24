@@ -59,12 +59,10 @@ const tiposUvaExistentes = [
     id: 1,
     nombre: 'Chardonnay',
     descripcion: 'Uva blanca famosa por su versatilidad en la elaboración de vinos blancos.',
-    requisitosSuelo: {
-      ph: 6.0,
-      nutrientes: 'Moderados',
-      humedad: '30-35%',
-    },
-    tiempoCosecha: 120,
+    requisito_ph: 6.0,
+    requisito_temperatura: 50,
+    requisito_humedad: 35,
+    tiempo_cosecha: 120,
     parcelas: [1],
   },
 ];
@@ -84,10 +82,10 @@ const CreateOrEditGrapeType = () => {
         form.setFieldsValue({
           nombre: tipoUva.nombre,
           descripcion: tipoUva.descripcion,
-          ph: tipoUva.requisitosSuelo.ph,
-          nutrientes: tipoUva.requisitosSuelo.nutrientes,
-          humedad: tipoUva.requisitosSuelo.humedad,
-          tiempoCosecha: tipoUva.tiempoCosecha,
+          ph: tipoUva.requisito_ph,
+          temperatura: tipoUva.requisito_temperatura,
+          humedad: tipoUva.requisito_humedad,
+          tiempo_cosecha: tipoUva.tiempo_cosecha,
           parcelas: tipoUva.parcelas,
         });
         setSelectedParcels(tipoUva.parcelas);
@@ -224,7 +222,7 @@ const CreateOrEditGrapeType = () => {
 
         <Form.Item
           label="Tiempo de Cosecha (días)"
-          name="tiempoCosecha"
+          name="tiempo_cosecha"
           rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}
         >
           <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
