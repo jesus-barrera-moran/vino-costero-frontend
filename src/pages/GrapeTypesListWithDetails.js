@@ -1,100 +1,34 @@
-import React from 'react';
-import { Table, Card, Collapse, Descriptions, Button } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Table, Card, Collapse, Descriptions, Button, Spin, message, Alert } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
-// Simulación de datos de tipos de uva y sus relaciones con múltiples parcelas
-const tiposUvaExistentes = [
-  {
-    id: 1,
-    nombre: 'Chardonnay',
-    descripcion: 'Uva blanca famosa por su versatilidad en la elaboración de vinos blancos.',
-    ph_requerido: 6.0,
-    humedad_requerida: '30',
-    temperatura_requerida: '50',
-    tiempoCosecha: 120,
-    parcelas: [
-      {
-        id: 1,
-        nombre: 'Parcela 1',
-        dimensiones: {
-          superficie: 10,
-          longitud: 500,
-          anchura: 200,
-          pendiente: 15,
-        },
-        siembraActual: {
-          cantidad_plantas: 150,
-          tecnica_siembra: 'Trasplante',
-          observaciones: 'Crecimiento óptimo',
-        },
-        controlTierra: {
-          ph: 6.2,
-          humedad: 32,
-          temperatura: 18,
-          observaciones: 'Condiciones normales',
-        },
-      },
-      {
-        id: 2,
-        nombre: 'Parcela 3',
-        dimensiones: {
-          superficie: 12,
-          longitud: 600,
-          anchura: 250,
-          pendiente: 18,
-        },
-        siembraActual: {
-          cantidad_plantas: 200,
-          tecnica_siembra: 'Siembra directa',
-          observaciones: 'Buen desarrollo',
-        },
-        controlTierra: {
-          ph: 6.1,
-          humedad: 30,
-          temperatura: 17,
-          observaciones: 'Condiciones normales',
-        },
-      },
-    ],
-  },
-  {
-    id: 2,
-    nombre: 'Pinot Noir',
-    descripcion: 'Variedad de uva tinta utilizada para vinos elegantes y de carácter.',
-    ph_requerido: 6.2,
-    humedad_requerida: '35',
-    temperatura_requerida: '40',
-    tiempoCosecha: 150,
-    parcelas: [
-      {
-        id: 2,
-        nombre: 'Parcela 2',
-        dimensiones: {
-          superficie: 8,
-          longitud: 400,
-          anchura: 150,
-          pendiente: 12,
-        },
-        siembraActual: {
-          cantidad_plantas: 180,
-          tecnica_siembra: 'Trasplante',
-          observaciones: 'Crecimiento lento',
-        },
-        controlTierra: {
-          ph: 6.5,
-          humedad: 36,
-          temperatura: 19,
-          observaciones: 'Condiciones normales',
-        },
-      },
-    ],
-  },
-];
-
 const GrapeTypeOverview = () => {
   const navigate = useNavigate();
+  const [tiposUva, setTiposUva] = useState([]);
+  const [loading, setLoading] = useState(true); // Estado de carga
+
+  // Función para obtener los tipos de uva desde el backend
+  const fetchTiposUva = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/tiposUvas'); // Ajustar la URL según tu configuración
+      if (!response.ok) {
+        throw new Error('Error al obtener los tipos de uva');
+      }
+      const data = await response.json();
+      setTiposUva(data);
+      setLoading(false); // Detener el estado de carga cuando se obtienen los datos
+    } catch (error) {
+      message.error('Error al cargar los tipos de uva.');
+      setLoading(false); // Detener el estado de carga si hay un error
+    }
+  };
+
+  useEffect(() => {
+    fetchTiposUva();
+  }, []);
 
   // Columnas para el listado de tipos de uva
   const columns = [
@@ -124,6 +58,10 @@ const GrapeTypeOverview = () => {
     },
   ];
 
+  const handleCreateSiembra = () => {
+    navigate(`/create-sowing/`);
+  };
+
   // Función para mostrar los detalles del tipo de uva y las parcelas relacionadas
   const expandedRowRender = (uva) => {
     return (
@@ -143,7 +81,8 @@ const GrapeTypeOverview = () => {
         {/* Acordeón para las parcelas donde está plantada la uva */}
         <Panel header="Parcelas donde está plantada" key="2">
           <Collapse accordion>
-            {uva.parcelas.map((parcela, index) => (
+            {uva.parcelas && uva.parcelas.length > 0 ?
+            uva.parcelas.map((parcela, index) => (
               <Panel header={`Parcela: ${parcela.nombre}`} key={index + 1}>
                 {/* Acordeón para la Siembra Activa */}
                 <Collapse accordion>
@@ -176,21 +115,46 @@ const GrapeTypeOverview = () => {
                   </Panel>
                 </Collapse>
               </Panel>
-            ))}
+            )) : (
+              <div>
+                <Alert
+                  message="No hay siembra activa para este tipo de uva."
+                  description="Puedes agregar una nueva siembra para este tipo de uva."
+                  type="warning"
+                  showIcon
+                />
+                <Button
+                  type="primary"
+                  style={{ marginTop: 10 }}
+                  icon={<PlusOutlined />}
+                  onClick={() => handleCreateSiembra()}
+                >
+                  Crear nueva siembra
+                </Button>
+              </div>
+            )}
           </Collapse>
         </Panel>
       </Collapse>
     );
   };
 
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando tipos de uva..." />
+      </div>
+    );
+  }
+
   return (
     <Card title="Gestión de Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
       <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-grape-type')}>
-        Registrar Nuevo Tipo de Uva 
+        Registrar Nuevo Tipo de Uva
       </Button>
       <Table
         columns={columns}
-        dataSource={tiposUvaExistentes}
+        dataSource={tiposUva}
         rowKey="id"
         expandable={{
           expandedRowRender: (record) => expandedRowRender(record),

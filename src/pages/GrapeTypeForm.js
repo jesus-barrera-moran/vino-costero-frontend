@@ -5,108 +5,100 @@ import { useNavigate, useParams } from 'react-router-dom';
 const { Option } = Select;
 const { Panel } = Collapse;
 
-// Simulación de datos de parcelas con siembras activas
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    dimensiones: {
-      superficie: 10,
-      longitud: 500,
-      anchura: 200,
-      pendiente: 15,
-    },
-    controlTierra: {
-      ph: 6.2,
-      humedad: 32,
-      temperatura: 18,
-      observaciones: 'Condiciones normales',
-    },
-    siembraActiva: {
-      fechaPlantacion: '2023-05-10',
-      cantidadPlantas: 1000,
-      tecnica: 'Siembra directa',
-      observaciones: 'Observaciones de la siembra...',
-    },
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    dimensiones: {
-      superficie: 12,
-      longitud: 600,
-      anchura: 250,
-      pendiente: 18,
-    },
-    controlTierra: {
-      ph: 6.5,
-      humedad: 36,
-      temperatura: 19,
-      observaciones: 'Condiciones óptimas',
-    },
-    siembraActiva: {
-      fechaPlantacion: '2023-04-20',
-      cantidadPlantas: 1200,
-      tecnica: 'Trasplante',
-      observaciones: 'Observaciones de la siembra...',
-    },
-  },
-];
-
-// Simulación de datos de tipos de uva existentes
-const tiposUvaExistentes = [
-  {
-    id: 1,
-    nombre: 'Chardonnay',
-    descripcion: 'Uva blanca famosa por su versatilidad en la elaboración de vinos blancos.',
-    requisito_ph: 6.0,
-    requisito_temperatura: 50,
-    requisito_humedad: 35,
-    tiempo_cosecha: 120,
-    parcelas: [1],
-  },
-];
-
 const CreateOrEditGrapeType = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // Captura el ID del tipo de uva si es edición
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [selectedParcels, setSelectedParcels] = useState([]);
+  const [parcelas, setParcelas] = useState([]); // Estado para las parcelas disponibles
+  const [selectedParcels, setSelectedParcels] = useState([]); // Estado para las parcelas seleccionadas
+  const [loading, setLoading] = useState(true);
 
+  // Cargar los datos de parcelas y del tipo de uva si es edición
   useEffect(() => {
-    if (id) {
-      const tipoUva = tiposUvaExistentes.find((uva) => uva.id === parseInt(id));
-      if (tipoUva) {
-        setIsEditMode(true);
-        form.setFieldsValue({
-          nombre: tipoUva.nombre,
-          descripcion: tipoUva.descripcion,
-          ph: tipoUva.requisito_ph,
-          temperatura: tipoUva.requisito_temperatura,
-          humedad: tipoUva.requisito_humedad,
-          tiempo_cosecha: tipoUva.tiempo_cosecha,
-          parcelas: tipoUva.parcelas,
+    const fetchData = async () => {
+      try {
+        // Obtener todas las parcelas
+        const parcelasResponse = await fetch('http://localhost:3000/parcelas');
+        const parcelasData = await parcelasResponse.json();
+  
+        // Filtrar solo las parcelas que tengan siembra activa sin un tipo de uva asignado
+        const parcelasFiltradas = !id && parcelasData.filter((parcela) => {
+          return (
+            parcela.siembra_activa && // Tiene siembra activa
+            !parcela.siembra_activa.tipo_uva // No tiene tipo de uva asignado
+          );
         });
-        setSelectedParcels(tipoUva.parcelas);
+  
+        setParcelas(id ? parcelasData : parcelasFiltradas);
+  
+        if (id) {
+          // Si hay un ID en la URL, estamos en modo de edición
+          const tipoUvaResponse = await fetch(`http://localhost:3000/tiposUvas/${id}`);
+          const tipoUvaData = await tipoUvaResponse.json();
+          setIsEditMode(true);
+          form.setFieldsValue({
+            nombre: tipoUvaData.nombre,
+            descripcion: tipoUvaData.descripcion,
+            ph: tipoUvaData.requisito_ph,
+            temperatura: tipoUvaData.requisito_temperatura,
+            humedad: tipoUvaData.requisito_humedad,
+            tiempo_cosecha: tipoUvaData.tiempo_cosecha,
+            parcelas: tipoUvaData.parcelas,
+          });
+          setSelectedParcels(tipoUvaData.parcelas);
+        }
+        setLoading(false);
+      } catch (error) {
+        message.error('Error al cargar los datos.');
+        setLoading(false);
       }
-    }
-  }, [id, form]);
+    };
+    fetchData();
+  }, [id, form]);  
 
-  const onFinish = (values) => {
-    if (isEditMode) {
-      console.log('Tipo de uva actualizado:', values);
-      message.success('Tipo de uva actualizado exitosamente');
-    } else {
-      console.log('Nuevo tipo de uva registrado:', values);
-      message.success('Nuevo tipo de uva registrado exitosamente');
+  const onFinish = async (values) => {
+    try {
+      const url = isEditMode
+        ? `http://localhost:3000/tiposUvas/${id}`
+        : 'http://localhost:3000/tiposUvas';
+      const method = isEditMode ? 'PUT' : 'POST';
+
+      const payload = {
+        nombre: values.nombre,
+        descripcion: values.descripcion,
+        ph: values.ph,
+        temperatura: values.temperatura,
+        humedad: values.humedad,
+        tiempoCosecha: values.tiempo_cosecha,
+      };
+
+      if (!isEditMode && values.parcelas && values.parcelas.length > 0) {
+        payload.parcelas = values.parcelas;
+      }
+
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en el servidor');
+      }
+
+      const messageText = isEditMode ? 'Tipo de uva actualizado' : 'Nuevo tipo de uva registrado';
+      message.success(`${messageText} exitosamente`);
+      navigate('/grape-types');
+    } catch (error) {
+      message.error('Error al guardar los datos.');
     }
-    navigate('/');
   };
 
-  // Función para renderizar los acordeones con la información de las parcelas y siembras activas
-  const renderParcelDetails = (parcelaId) => {
-    const parcela = parcelasExistentes.find((p) => p.id === parcelaId);
+  const renderParcelDetails = (parcelNombre) => {
+    const parcela = parcelas.find((p) => p.nombre === parcelNombre);
     if (parcela) {
       return (
         <Collapse accordion key={parcela.id} style={{ marginBottom: '10px' }}>
@@ -125,20 +117,20 @@ const CreateOrEditGrapeType = () => {
               {/* Acordeón para el Último Control de Tierra */}
               <Panel header="Último Control de Tierra" key={`controlTierra-${parcela.id}`}>
                 <Descriptions column={2} bordered>
-                  <Descriptions.Item label="PH del Suelo">{parcela.controlTierra.ph}</Descriptions.Item>
-                  <Descriptions.Item label="Humedad">{parcela.controlTierra.humedad}%</Descriptions.Item>
-                  <Descriptions.Item label="Temperatura">{parcela.controlTierra.temperatura}°C</Descriptions.Item>
-                  <Descriptions.Item label="Observaciones">{parcela.controlTierra.observaciones}</Descriptions.Item>
+                  <Descriptions.Item label="PH del Suelo">{parcela.control_tierra.ph}</Descriptions.Item>
+                  <Descriptions.Item label="Humedad">{parcela.control_tierra.humedad}%</Descriptions.Item>
+                  <Descriptions.Item label="Temperatura">{parcela.control_tierra.temperatura}°C</Descriptions.Item>
+                  <Descriptions.Item label="Observaciones">{parcela.control_tierra.observaciones}</Descriptions.Item>
                 </Descriptions>
               </Panel>
 
               {/* Acordeón para la Siembra Activa */}
-              {parcela.siembraActiva && (
+              {parcela.siembra_activa && (
                 <Panel header="Siembra Activa" key={`siembra-${parcela.id}`}>
                   <Descriptions column={1} bordered>
-                    <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActiva.cantidadPlantas}</Descriptions.Item>
-                    <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActiva.tecnica}</Descriptions.Item>
-                    <Descriptions.Item label="Observaciones">{parcela.siembraActiva.observaciones}</Descriptions.Item>
+                    <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa.cantidad_plantas}</Descriptions.Item>
+                    <Descriptions.Item label="Técnica de Siembra">{parcela.siembra_activa.tecnica}</Descriptions.Item>
+                    <Descriptions.Item label="Observaciones">{parcela.siembra_activa.observaciones}</Descriptions.Item>
                   </Descriptions>
                 </Panel>
               )}
@@ -150,28 +142,31 @@ const CreateOrEditGrapeType = () => {
     return null;
   };
 
+  if (loading) {
+    return <p>Cargando datos...</p>;
+  }
+
   return (
     <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20 }}>
       <Form form={form} layout="vertical" name="create-edit-grape-type" onFinish={onFinish}>
         {/* Selección de Parcelas */}
-        <Form.Item
-          label="Seleccionar Parcelas"
-          name="parcelas"
-        >
-          <Select
-            mode="multiple"
-            placeholder="Seleccione las parcelas"
-            defaultValue={selectedParcels}
-            onChange={setSelectedParcels}
-            disabled={isEditMode}
-          >
-            {parcelasExistentes.map((parcela) => (
-              <Option key={parcela.id} value={parcela.id}>
-                {parcela.nombre}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+        {parcelas && parcelas.length > 0 && (
+          <Form.Item label="Seleccionar Parcelas" name="parcelas">
+            <Select
+              mode="multiple"
+              placeholder="Seleccione las parcelas"
+              defaultValue={selectedParcels}
+              onChange={setSelectedParcels}
+              disabled={isEditMode}
+            >
+              {parcelas.map((parcela) => (
+                <Option key={parcela.id} value={parcela.id}>
+                  {parcela.nombre}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
 
         {/* Acordeones para las parcelas seleccionadas */}
         {selectedParcels.length > 0 && (
@@ -180,51 +175,27 @@ const CreateOrEditGrapeType = () => {
           </div>
         )}
 
-        <Form.Item
-          label="Nombre de la Uva"
-          name="nombre"
-          rules={[{ required: true, message: 'Por favor, ingrese el nombre de la uva' }]}
-        >
+        <Form.Item label="Nombre de la Uva" name="nombre" rules={[{ required: true, message: 'Por favor, ingrese el nombre de la uva' }]}>
           <Input placeholder="Nombre de la uva" />
         </Form.Item>
 
-        <Form.Item
-          label="Descripción"
-          name="descripcion"
-          rules={[{ required: true, message: 'Por favor, ingrese una descripción' }]}
-        >
+        <Form.Item label="Descripción" name="descripcion" rules={[{ required: true, message: 'Por favor, ingrese una descripción' }]}>
           <Input.TextArea placeholder="Descripción de la uva" />
         </Form.Item>
 
-        <Form.Item
-          label="PH del Suelo"
-          name="ph"
-          rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}
-        >
+        <Form.Item label="PH del Suelo" name="ph" rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}>
           <InputNumber min={0} max={14} placeholder="PH del suelo" style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item
-          label="Nutrientes Requeridos"
-          name="nutrientes"
-          rules={[{ required: true, message: 'Por favor, ingrese los nutrientes requeridos' }]}
-        >
-          <Input placeholder="Nutrientes requeridos" />
-        </Form.Item>
-
-        <Form.Item
-          label="Humedad (%)"
-          name="humedad"
-          rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}
-        >
+        <Form.Item label="Humedad (%)" name="humedad" rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}>
           <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item
-          label="Tiempo de Cosecha (días)"
-          name="tiempo_cosecha"
-          rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}
-        >
+        <Form.Item label="Temperatura (°C)" name="temperatura" rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}>
+          <InputNumber min={0} placeholder="Temperatura" style={{ width: '100%' }} />
+        </Form.Item>
+
+        <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}>
           <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
         </Form.Item>
 
