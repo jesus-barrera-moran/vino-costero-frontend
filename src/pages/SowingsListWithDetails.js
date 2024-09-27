@@ -1,56 +1,35 @@
-import React from 'react';
-import { Table, Card, Collapse, Descriptions, Timeline, Button } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Table, Card, Collapse, Descriptions, Timeline, Button, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { EditOutlined } from '@ant-design/icons'; // Íconos
 
 const { Panel } = Collapse;
 
-// Simulación de datos de parcelas y siembras
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    siembraActual: {
-      tipoUva: 'Chardonnay',
-      fechaCreacion: '2023-05-01',
-      cantidadPlantas: 1000,
-      tecnica: 'Siembra directa',
-      observaciones: 'Se plantaron 1000 plantas de uva Chardonnay en la parcela 1.',
-    },
-    historialSiembras: [
-      {
-        tipoUva: 'Pinot Noir',
-        fechaCreacion: '2022-06-10',
-        cantidadPlantas: 800,
-        tecnica: 'Trasplante',
-        observaciones: 'Se trasplantaron 800 plantas de uva Pinot Noir en la parcela 1.',
-      },
-    ],
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    siembraActual: {
-      tipoUva: 'Sauvignon Blanc',
-      fechaCreacion: '2023-04-15',
-      cantidadPlantas: 900,
-      tecnica: 'Siembra directa',
-      observaciones: 'Se plantaron 900 plantas de uva Sauvignon Blanc en la parcela 2.',
-    },
-    historialSiembras: [
-      {
-        tipoUva: 'Cabernet Sauvignon',
-        fechaCreacion: '2021-08-20',
-        cantidadPlantas: 850,
-        tecnica: 'Siembra directa',
-        observaciones: 'Se plantaron 850 plantas de uva Cabernet Sauvignon en la parcela 2.',
-      },
-    ],
-  },
-];
-
 const ParcelSowingOverview = () => {
   const navigate = useNavigate();
+  const [parcelas, setParcelas] = useState([]);
+  const [loading, setLoading] = useState(true); // Para mostrar el estado de carga
+
+  // Función para obtener las parcelas con siembras activas e historiales de siembra
+  const fetchParcelas = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/siembras'); // Ajustar la URL según el backend
+      if (!response.ok) {
+        throw new Error('Error al obtener las parcelas con siembras');
+      }
+      const data = await response.json();
+      setParcelas(data);
+      setLoading(false);
+    } catch (error) {
+      message.error('Hubo un error al cargar las siembras.');
+      setLoading(false);
+    }
+  };
+
+  // Llamar al endpoint al cargar el componente
+  useEffect(() => {
+    fetchParcelas();
+  }, []);
 
   // Columnas para el listado de parcelas
   const columns = [
@@ -72,9 +51,14 @@ const ParcelSowingOverview = () => {
     {
       title: 'Acciones',
       key: 'acciones',
-      render: (record) => (
-        <Button type="primary" onClick={() => navigate(`/create-sowing/${record.id}`)}>
-          Crear Siembra
+      render: (parcela) => (
+        <Button
+          type="default"
+          icon={<EditOutlined />}
+          style={{ color: '#52c41a' }} // Verde para la siembra
+          onClick={() => navigate(`/edit-sowing/${parcela.id}`)}
+        >
+          Editar
         </Button>
       ),
     },
@@ -88,47 +72,54 @@ const ParcelSowingOverview = () => {
         <Panel
           header="Siembra Actual"
           key="1"
-          extra={
-            <Button
-              type="default"
-              icon={<EditOutlined />}
-              style={{ color: '#52c41a' }} // Verde para la siembra
-              onClick={() => navigate(`/edit-sowing/${parcela.id}`)}
-            >
-              Editar
-            </Button>
-          }
         >
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Tipo de Uva">{parcela.siembraActual.tipoUva}</Descriptions.Item>
-            <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActual.cantidadPlantas}</Descriptions.Item>
-            <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActual.tecnica}</Descriptions.Item>
-            <Descriptions.Item label="Observaciones">{parcela.siembraActual.observaciones}</Descriptions.Item>
-          </Descriptions>
+          {parcela.siembraActual ? (
+            <Descriptions column={2} bordered>
+              <Descriptions.Item label="Tipo de Uva">{parcela.siembraActual.tipoUva}</Descriptions.Item>
+              <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActual.cantidadPlantas}</Descriptions.Item>
+              <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActual.tecnica}</Descriptions.Item>
+              <Descriptions.Item label="Observaciones">{parcela.siembraActual.observaciones}</Descriptions.Item>
+            </Descriptions>
+          ) : (
+            <p>No hay siembra activa en esta parcela.</p>
+          )}
         </Panel>
 
         {/* Historial de Siembras */}
         <Panel header="Historial de Siembras" key="2">
-          <Timeline>
-            {parcela.historialSiembras.map((siembra, index) => (
-              <Timeline.Item key={index}>
-                <Collapse>
-                  <Panel header={`Siembra del ${siembra.fechaCreacion}`} key={index + 1}>
-                    <Descriptions column={2} bordered>
-                      <Descriptions.Item label="Tipo de Uva">{siembra.tipoUva}</Descriptions.Item>
-                      <Descriptions.Item label="Cantidad de Plantas">{siembra.cantidadPlantas}</Descriptions.Item>
-                      <Descriptions.Item label="Técnica de Siembra">{siembra.tecnica}</Descriptions.Item>
-                      <Descriptions.Item label="Observaciones">{siembra.observaciones}</Descriptions.Item>
-                    </Descriptions>
-                  </Panel>
-                </Collapse>
-              </Timeline.Item>
-            ))}
-          </Timeline>
+          {parcela.historialSiembras.length > 0 ? (
+            <Timeline>
+              {parcela.historialSiembras.map((siembra, index) => (
+                <Timeline.Item key={index}>
+                  <Collapse>
+                    <Panel header={`Siembra del ${siembra.fechaCreacion}`} key={index + 1}>
+                      <Descriptions column={2} bordered>
+                        <Descriptions.Item label="Tipo de Uva">{siembra.tipoUva}</Descriptions.Item>
+                        <Descriptions.Item label="Cantidad de Plantas">{siembra.cantidadPlantas}</Descriptions.Item>
+                        <Descriptions.Item label="Técnica de Siembra">{siembra.tecnica}</Descriptions.Item>
+                        <Descriptions.Item label="Observaciones">{siembra.observaciones}</Descriptions.Item>
+                      </Descriptions>
+                    </Panel>
+                  </Collapse>
+                </Timeline.Item>
+              ))}
+            </Timeline>
+          ) : (
+            <p>No hay historial de siembras.</p>
+          )}
         </Panel>
       </Collapse>
     );
   };
+
+  // Muestra el estado de carga mientras los datos se están obteniendo
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando siembras..." />
+      </div>
+    );
+  }
 
   return (
     <Card title="Visualización de Parcelas y Siembras" bordered={false} style={{ marginTop: 20 }}>
@@ -137,7 +128,7 @@ const ParcelSowingOverview = () => {
       </Button>
       <Table
         columns={columns}
-        dataSource={parcelasExistentes}
+        dataSource={parcelas}
         rowKey="id"
         expandable={{
           expandedRowRender: (record) => expandedRowRender(record),
