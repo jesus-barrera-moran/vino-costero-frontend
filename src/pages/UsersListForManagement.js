@@ -1,80 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Button, Select, Switch, message, Card } from 'antd';
+import axios from 'axios';
 
 const { Option } = Select;
 
 const UserManagement = () => {
-  // Datos falsos de usuarios para pruebas
-  const [usuarios, setUsuarios] = useState([
-    {
-      id_usuario: 1,
-      usuario: 'johndoe',
-      nombre: 'John',
-      apellido: 'Doe',
-      correo: 'johndoe@example.com',
-      rol: 'Administrador del Sistema',
-      habilitado: true,
-    },
-    {
-      id_usuario: 2,
-      usuario: 'janedoe',
-      nombre: 'Jane',
-      apellido: 'Doe',
-      correo: 'janedoe@example.com',
-      rol: 'Gestor de Producción',
-      habilitado: false,
-    },
-    {
-      id_usuario: 3,
-      usuario: 'bobsponge',
-      nombre: 'Bob',
-      apellido: 'Sponge',
-      correo: 'bobsponge@example.com',
-      rol: 'Operador de Campo',
-      habilitado: true,
-    },
-    {
-      id_usuario: 4,
-      usuario: 'alicesmith',
-      nombre: 'Alice',
-      apellido: 'Smith',
-      correo: 'alicesmith@example.com',
-      rol: 'Supervisor de Campo',
-      habilitado: false,
-    },
-    {
-      id_usuario: 5,
-      usuario: 'chrisrock',
-      nombre: 'Chris',
-      apellido: 'Rock',
-      correo: 'chrisrock@example.com',
-      rol: 'Auditor',
-      habilitado: true,
-    },
-  ]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Cargar los usuarios desde el backend
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('http://localhost:3000/usuarios'); // Ajusta la URL según tu backend
+        setUsuarios(response.data);
+      } catch (error) {
+        message.error('Error al cargar los usuarios');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
 
   // Función para manejar el cambio de rol
-  const handleRoleChange = (value, record) => {
-    setUsuarios((prevUsuarios) =>
-      prevUsuarios.map((usuario) =>
-        usuario.id_usuario === record.id_usuario ? { ...usuario, rol: value } : usuario
-      )
-    );
+  const handleRoleChange = async (value, record) => {
+    try {
+      const updatedUser = { ...record, rol: value };
+      await axios.put(`http://localhost:3000/usuarios/${record.id_usuario}`, { rol: value });
+      setUsuarios((prevUsuarios) =>
+        prevUsuarios.map((usuario) =>
+          usuario.id_usuario === record.id_usuario ? updatedUser : usuario
+        )
+      );
+      message.success(`Rol actualizado para ${record.nombre}`);
+    } catch (error) {
+      message.error('Error al actualizar el rol');
+    }
   };
 
   // Función para manejar el cambio de estado
-  const handleToggleEstado = (checked, record) => {
-    setUsuarios((prevUsuarios) =>
-      prevUsuarios.map((usuario) =>
-        usuario.id_usuario === record.id_usuario ? { ...usuario, habilitado: checked } : usuario
-      )
-    );
-  };
-
-  // Función para guardar cambios de usuario (simulación)
-  const handleGuardarCambios = (record) => {
-    message.success(`Cambios guardados para el usuario ${record.nombre} ${record.apellido}`);
-    console.log('Datos guardados:', record);
+  const handleToggleEstado = async (checked, record) => {
+    try {
+      const updatedUser = { ...record, habilitado: checked };
+      await axios.put(`http://localhost:3000/usuarios/${record.id_usuario}`, { habilitado: checked });
+      setUsuarios((prevUsuarios) =>
+        prevUsuarios.map((usuario) =>
+          usuario.id_usuario === record.id_usuario ? updatedUser : usuario
+        )
+      );
+      message.success(`Estado actualizado para ${record.nombre}`);
+    } catch (error) {
+      message.error('Error al actualizar el estado');
+    }
   };
 
   // Columnas de la tabla
@@ -123,7 +103,7 @@ const UserManagement = () => {
   ];
 
   return (
-    <Card title="Gestión de Usuarios (Datos de Prueba)" bordered={false} style={{ marginTop: 20 }}>
+    <Card title="Gestión de Usuarios" bordered={false} style={{ marginTop: 20 }}>
       <Button
         type="primary"
         style={{ marginBottom: 20 }}
@@ -131,7 +111,7 @@ const UserManagement = () => {
       >
         Nuevo Usuario +
       </Button>
-      <Table columns={columns} dataSource={usuarios} rowKey="id_usuario" />
+      <Table columns={columns} dataSource={usuarios} rowKey="id_usuario" loading={loading} />
     </Card>
   );
 };

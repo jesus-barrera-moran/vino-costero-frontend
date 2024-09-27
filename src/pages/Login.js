@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Button, Card, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Suponiendo que existe un backend para autenticación
+import axios from 'axios';
 
 const Login = () => {
   const [loading, setLoading] = React.useState(false);
@@ -10,21 +10,24 @@ const Login = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Petición al backend para autenticar usuario (simulación por ahora)
-      const response = await axios.post('/api/login', {
-        usuario: values.usuario,
-        contrasena: values.contrasena,
+      // Petición al backend para autenticar usuario
+      const response = await axios.post('http://localhost:3000/login', {
+        username: values.usuario,
+        password: values.contrasena,
       });
-      
-      if (response.data.success) {
+
+      if (response.data.token) {
+        // Guardar el token JWT en localStorage
+        localStorage.setItem('token', response.data.token);
+
+        // Mensaje de éxito y redirección
         message.success('Inicio de sesión exitoso');
-        // Redirigir al dashboard o la pantalla principal después de autenticarse
-        navigate('/');
+        navigate('/'); // Redirigir al dashboard o la pantalla principal
       } else {
         message.error('Nombre de usuario o contraseña incorrectos');
       }
     } catch (error) {
-      message.error('Error en el inicio de sesión');
+      message.error('Error en el inicio de sesión. Verifique sus credenciales.');
     } finally {
       setLoading(false);
     }

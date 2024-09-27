@@ -16,7 +16,7 @@ const CreateOrEditUser = () => {
     // Obtener roles predefinidos
     const fetchRoles = async () => {
       try {
-        const response = await axios.get('/api/roles');
+        const response = await axios.get('http://localhost:3000/roles'); // Ajusta la URL de acuerdo a tu configuración
         setRoles(response.data);
       } catch (error) {
         message.error('Error al obtener roles');
@@ -30,16 +30,15 @@ const CreateOrEditUser = () => {
       setIsEditMode(true);
       const fetchUsuario = async () => {
         try {
-          const response = await axios.get(`/api/usuarios/${id}`);
+          const response = await axios.get(`http://localhost:3000/usuarios/${id}`); // Ajusta la URL
           const usuario = response.data;
           form.setFieldsValue({
             nombre: usuario.nombre,
             apellido: usuario.apellido,
             usuario: usuario.usuario,
             email: usuario.correo,
-            contrasena: usuario.contrasena,
             habilitado: usuario.habilitado,
-            rol: usuario.rol, // Cargar el rol actual desde la tabla usuario_roles
+            rol: usuario.roles.map((role) => role.id_rol), // Cargar el rol actual desde la tabla usuario_roles
           });
         } catch (error) {
           message.error('Error al obtener datos del usuario');
@@ -53,14 +52,20 @@ const CreateOrEditUser = () => {
     try {
       if (isEditMode) {
         // Modo edición: actualizar usuario existente
-        await axios.put(`/api/usuarios/${id}`, values);
+        await axios.put(`http://localhost:3000/usuarios/${id}`, {
+          ...values,
+          roles: [values.rol], // El backend espera un array de roles
+        });
         message.success('Usuario actualizado exitosamente');
       } else {
         // Modo creación: registrar nuevo usuario
-        await axios.post('/api/usuarios', values);
+        await axios.post('http://localhost:3000/usuarios', {
+          ...values,
+          roles: [values.rol], // El backend espera un array de roles
+        });
         message.success('Usuario registrado exitosamente');
       }
-      navigate('/');
+      navigate('/usuarios'); // Redirigir al listado de usuarios después de guardar
     } catch (error) {
       message.error('Error al guardar el usuario');
     }
@@ -115,27 +120,31 @@ const CreateOrEditUser = () => {
         </Form.Item>
 
         {/* Contraseña */}
-        <Form.Item
-          label="Contraseña"
-          name="contrasena"
-          rules={[{ required: true, message: 'Por favor, ingrese una contraseña' }]}
-        >
-          <Input.Password placeholder="Contraseña" />
-        </Form.Item>
+        {!isEditMode && (
+          <>
+            <Form.Item
+              label="Contraseña"
+              name="contrasena"
+              rules={[{ required: true, message: 'Por favor, ingrese una contraseña' }]}
+            >
+              <Input.Password placeholder="Contraseña" />
+            </Form.Item>
 
-        {/* Confirmar Contraseña */}
-        <Form.Item
-          label="Confirmar Contraseña"
-          name="confirmarContrasena"
-          dependencies={['contrasena']}
-          hasFeedback
-          rules={[
-            { required: true, message: 'Por favor, confirme su contraseña' },
-            validatePasswordConfirmation,
-          ]}
-        >
-          <Input.Password placeholder="Confirmar Contraseña" />
-        </Form.Item>
+            {/* Confirmar Contraseña */}
+            <Form.Item
+              label="Confirmar Contraseña"
+              name="confirmarContrasena"
+              dependencies={['contrasena']}
+              hasFeedback
+              rules={[
+                { required: true, message: 'Por favor, confirme su contraseña' },
+                validatePasswordConfirmation,
+              ]}
+            >
+              <Input.Password placeholder="Confirmar Contraseña" />
+            </Form.Item>
+          </>
+        )}
 
         {/* Habilitado */}
         <Form.Item
