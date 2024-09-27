@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Space, Collapse, Descriptions, Card, message, Spin } from 'antd';
-import { EditOutlined, PlusOutlined } from '@ant-design/icons'; // Íconos
+import { Table, Button, Space, Collapse, Descriptions, Card, message, Spin, Alert } from 'antd';
+import { EditOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
@@ -12,18 +12,20 @@ const ParcelsListWithDetails = () => {
 
   // Función para obtener todas las parcelas desde el backend
   const fetchParcelas = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:3000/parcelas');
-      if (!response.ok) {
-        throw new Error('Error al obtener las parcelas');
+    if (!loading) {
+      setLoading(true);
+      try {
+        const response = await fetch('http://localhost:3000/parcelas');
+        if (!response.ok) {
+          throw new Error('Error al obtener las parcelas');
+        }
+        const data = await response.json();
+        setParcelas(data);
+      } catch (error) {
+        message.error('Hubo un error al cargar las parcelas.');
+      } finally {
+        setLoading(false);
       }
-      const data = await response.json();
-      setParcelas(data);
-    } catch (error) {
-      message.error('Hubo un error al cargar las parcelas.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -89,6 +91,10 @@ const ParcelsListWithDetails = () => {
     navigate(`/create-soil-control/${id}`);
   };
 
+  const handleCreateSiembra = (id) => {
+    navigate(`/create-sowing/${id}`);
+  };
+
   // Función para mostrar los detalles de cada parcela
   const expandedRowRender = (parcela) => {
     return (
@@ -117,28 +123,51 @@ const ParcelsListWithDetails = () => {
         </Panel>
 
         {/* Siembra Activa */}
-        <Panel
-          header="Siembra Activa"
-          key="2"
-          extra={
+        {parcela.siembra_activa ? (
+          <Panel
+            header="Siembra Activa"
+            key="2"
+            extra={
+              <Button
+                type="default"
+                icon={<EditOutlined />}
+                style={{ color: '#52c41a' }} 
+                onClick={() => handleEditSiembra(parcela.id)}
+              >
+                Editar
+              </Button>
+            }
+          >
+            <Descriptions column={1} bordered>
+              <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
+              <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa.cantidad_plantas}</Descriptions.Item>
+              <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa.tecnica}</Descriptions.Item>
+              <Descriptions.Item label="Estado de la Siembra">{parcela.siembra_activa.estado}</Descriptions.Item>
+              <Descriptions.Item label="Observaciones">{parcela.siembra_activa.observaciones}</Descriptions.Item>
+            </Descriptions>
+          </Panel>
+        ) : (
+          <Panel
+            header={<span><ExclamationCircleOutlined /> Sin Siembra Activa</span>}
+            key="2"
+            style={{ backgroundColor: '#fffbe6' }}
+          >
+            <Alert
+              message="No hay siembra activa en esta parcela."
+              description="Puedes agregar una nueva siembra para esta parcela."
+              type="warning"
+              showIcon
+            />
             <Button
-              type="default"
-              icon={<EditOutlined />}
-              style={{ color: '#52c41a' }} // Verde para la siembra
-              onClick={() => handleEditSiembra(parcela.id)}
+              type="primary"
+              style={{ marginTop: 10 }}
+              icon={<PlusOutlined />}
+              onClick={() => handleCreateSiembra(parcela.id)}
             >
-              Editar
+              Crear nueva siembra
             </Button>
-          }
-        >
-          <Descriptions column={1} bordered>
-            <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa?.tipo_uva}</Descriptions.Item>
-            <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa?.cantidad_plantas}</Descriptions.Item>
-            <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa?.tecnica}</Descriptions.Item>
-            <Descriptions.Item label="Estado de la Siembra">{parcela.siembra_activa?.estado}</Descriptions.Item>
-            <Descriptions.Item label="Observaciones">{parcela.siembra_activa?.observaciones}</Descriptions.Item>
-          </Descriptions>
-        </Panel>
+          </Panel>
+        )}
 
         {/* Acordeón para Control de Tierra */}
         <Panel
@@ -148,7 +177,7 @@ const ParcelsListWithDetails = () => {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              style={{ backgroundColor: '#faad14', borderColor: '#faad14' }} // Naranja para crear control
+              style={{ backgroundColor: '#faad14', borderColor: '#faad14' }}
               onClick={() => handleCreateControlTierra(parcela.id)}
             >
               Crear

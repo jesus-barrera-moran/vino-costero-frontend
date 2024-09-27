@@ -7,9 +7,10 @@ import 'antd/dist/reset.css'; // Importación de los estilos Ant Design
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
+  // Comentar StrictMode temporalmente
+  // <React.StrictMode>
     <App />
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
