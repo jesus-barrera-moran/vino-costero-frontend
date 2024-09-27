@@ -1,53 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, InputNumber, message, Card, Collapse, Select } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 const { Option } = Select;
-
-// Simulación de datos existentes para edición
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    longitud: '-70.123456',
-    latitud: '-33.456789',
-    ubicacion: 'Fundo El Olivo',
-    estado_parcela: 'Con siembra activa',
-    dimensiones: {
-      superficie: 10,
-      dim_longitud: 500,
-      dim_anchura: 200,
-      pendiente: 15,
-    },
-    control_tierra: {
-      ph: 6.5,
-      humedad: 35,
-      temperatura: 18,
-      observaciones: 'Suelo ideal para Chardonnay',
-    },
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    longitud: '-70.654321',
-    latitud: '-33.123456',
-    ubicacion: 'Fundo La Escondida',
-    estado_parcela: 'Disponible',
-    dimensiones: {
-      superficie: 8,
-      dim_longitud: 400,
-      dim_anchura: 150,
-      pendiente: 12,
-    },
-    control_tierra: {
-      ph: 7,
-      humedad: 40,
-      temperatura: 20,
-      observaciones: 'Ideal para Sauvignon Blanc',
-    },
-  },
-];
 
 // Estados disponibles para la parcela
 const estadosParcelas = ['Disponible', 'Con siembra activa', 'En mantenimiento'];
@@ -57,33 +13,73 @@ const ParcelForm = () => {
   const { id } = useParams(); // Para identificar si estamos editando o creando
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false); // Estado de carga para la petición
   const isEditing = Boolean(id); // Si hay un id en la URL, estamos editando
-  const parcela = isEditing ? parcelasExistentes.find((p) => p.id === parseInt(id)) : null;
 
+  // Cargar los datos de la parcela si estamos en modo de edición
   useEffect(() => {
-    if (isEditing && parcela) {
-      // Separar valores de parcela y dimensiones/control de tierra para el formulario
-      form.setFieldsValue({
-        nombre: parcela.nombre,
-        longitud: parcela.longitud,
-        latitud: parcela.latitud,
-        ubicacion: parcela.ubicacion,
-        estado_parcela: parcela.estado_parcela,
-        dimensiones: parcela.dimensiones,
-        control_tierra: parcela.control_tierra,
-      });
-    }
-  }, [isEditing, parcela, form]);
-
-  const onFinish = (values) => {
     if (isEditing) {
-      console.log('Parcela actualizada:', values);
-      message.success('La parcela ha sido actualizada exitosamente');
-    } else {
-      console.log('Parcela creada:', values);
-      message.success('La parcela ha sido registrada exitosamente');
+      setLoading(true);
+      fetch(`http://localhost:3000/parcelas/${id}`) // Ajusta la URL según tu configuración
+        .then((response) => response.json())
+        .then((data) => {
+          form.setFieldsValue({
+            nombre: data.nombre,
+            longitud: data.longitud,
+            latitud: data.latitud,
+            ubicacion: data.ubicacion,
+            estado_parcela: data.estado,
+            dimensiones: data.dimensiones,
+            control_tierra: data.control_tierra,
+          });
+          setLoading(false);
+        })
+        .catch((error) => {
+          message.error('Error al cargar los datos de la parcela');
+          setLoading(false);
+        });
     }
-    navigate('/'); // Redirige al listado principal después de guardar
+  }, [isEditing, id, form]);
+
+  // Función para manejar el submit del formulario
+  const onFinish = async (values) => {
+    const url = isEditing
+      ? `http://localhost:3000/parcelas/${id}` // Para editar
+      : 'http://localhost:3000/parcelas'; // Para crear
+
+    const method = isEditing ? 'PUT' : 'POST'; // Elegir el método de la solicitud
+
+    setLoading(true); // Activamos el estado de carga
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre_parcela: values.nombre,
+          ubicacion_descripcion: values.ubicacion,
+          ubicacion_longitud: values.longitud,
+          ubicacion_latitud: values.latitud,
+          id_estado_parcela: estadosParcelas.indexOf(values.estado_parcela) + 1, // Convertimos a ID (asumiendo que en la base de datos los IDs son 1, 2, 3)
+          dimensiones: values.dimensiones,
+          control_tierra: values.control_tierra,
+        }),
+      });
+
+      if (response.ok) {
+        const messageText = isEditing ? 'La parcela ha sido actualizada exitosamente' : 'La parcela ha sido registrada exitosamente';
+        message.success(messageText);
+        navigate('/parcels'); // Redirige al listado principal después de guardar
+      } else {
+        throw new Error('Error en la respuesta del servidor');
+      }
+    } catch (error) {
+      message.error('Hubo un error al procesar la solicitud');
+    } finally {
+      setLoading(false); // Desactivamos el estado de carga
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -91,8 +87,8 @@ const ParcelForm = () => {
     message.error('Hubo un error al procesar la solicitud');
   };
 
-  const isDimensionEditable = !isEditing || parcela?.estado_parcela === 'Disponible';
-  const isControlEditable = !isEditing || parcela?.estado_parcela === 'Disponible';
+  const isDimensionEditable = !isEditing || form.getFieldValue('estado_parcela') === 'Disponible';
+  const isControlEditable = !isEditing || form.getFieldValue('estado_parcela') === 'Disponible';
 
   return (
     <Card title={isEditing ? `Editar Parcela` : `Registrar Nueva Parcela`} bordered={false} style={{ width: 800, margin: '0 auto', marginTop: 50 }}>
@@ -164,7 +160,7 @@ const ParcelForm = () => {
 
             <Form.Item
               label="Longitud (metros)"
-              name={['dimensiones', 'dim_longitud']}
+              name={['dimensiones', 'longitud']}
               rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela en metros' }]}
             >
               <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Longitud" style={{ width: '100%' }} />
@@ -172,7 +168,7 @@ const ParcelForm = () => {
 
             <Form.Item
               label="Anchura (metros)"
-              name={['dimensiones', 'dim_anchura']}
+              name={['dimensiones', 'anchura']}
               rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela en metros' }]}
             >
               <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Anchura" style={{ width: '100%' }} />
@@ -220,7 +216,7 @@ const ParcelForm = () => {
         </Collapse>
 
         <Form.Item style={{ marginTop: 20 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             {isEditing ? 'Actualizar Parcela' : 'Registrar Parcela'}
           </Button>
         </Form.Item>
