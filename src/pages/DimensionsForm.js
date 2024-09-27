@@ -1,46 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message } from 'antd';
+import { Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message, Spin } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const { Panel } = Collapse;
-
-// Simulación de datos de parcelas existentes
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    longitud: '123.456',
-    latitud: '456.789',
-    ubicacion: 'Valle de Casablanca',
-    estado: 'disponible',
-    dimensiones: {
-      superficie: 10,
-      longitud: 500,
-      anchura: 200,
-      pendiente: 15,
-    },
-    siembra_activa: null,
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    longitud: '123.456',
-    latitud: '456.789',
-    ubicacion: 'Valle de Casablanca',
-    estado: 'ocupada',
-    dimensiones: {
-      superficie: 8,
-      longitud: 400,
-      anchura: 150,
-      pendiente: 12,
-    },
-    siembra_activa: {
-      estado: 'activa',
-      nombre: 'Siembra Actual',
-      tipoUva: 'Pinot Noir',
-    },
-  },
-];
 
 // Función para calcular el área ocupada
 const calcularAreaOcupada = (longitud, anchura) => {
@@ -52,16 +14,22 @@ const EditParcelDimensions = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [parcela, setParcela] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado de carga
   const [areaOcupada, setAreaOcupada] = useState(0);
   const [porcentajeOcupado, setPorcentajeOcupado] = useState(0);
   const [warning, setWarning] = useState('');
 
-  // Simulación de búsqueda de parcela por ID
-  useEffect(() => {
-    const selectedParcela = parcelasExistentes.find((p) => p.id === parseInt(id));
-    if (selectedParcela) {
-      setParcela(selectedParcela);
-      const { longitud, anchura, superficie } = selectedParcela.dimensiones;
+  // Función para obtener los detalles de la parcela desde el backend
+  const fetchParcela = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/parcelas/${id}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener los detalles de la parcela');
+      }
+      const data = await response.json();
+      setParcela(data);
+
+      const { longitud, anchura, superficie } = data.dimensiones;
       const area = calcularAreaOcupada(longitud, anchura);
       setAreaOcupada(area);
       setPorcentajeOcupado(((area / superficie) * 100).toFixed(2));
@@ -69,11 +37,17 @@ const EditParcelDimensions = () => {
         superficie: superficie,
         longitud: longitud,
         anchura: anchura,
-        pendiente: selectedParcela.dimensiones.pendiente,
+        pendiente: data.dimensiones.pendiente,
       });
-    } else {
-      message.error('Parcela no encontrada');
+      setLoading(false);
+    } catch (error) {
+      message.error('Error al cargar la parcela');
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchParcela();
   }, [id, form]);
 
   // Función para manejar los cambios en las dimensiones
@@ -95,105 +69,127 @@ const EditParcelDimensions = () => {
     }
   };
 
-  const onFinish = (values) => {
-    console.log('Dimensiones actualizadas:', values);
-    message.success('Las dimensiones se han actualizado exitosamente');
-    navigate('/');
+  // Función para manejar el envío del formulario
+  const onFinish = async (values) => {
+    try {
+      const response = await fetch(`http://localhost:3000/dimensiones/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          superficie: values.superficie,
+          longitud: values.longitud,
+          anchura: values.anchura,
+          pendiente: values.pendiente,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar las dimensiones');
+      }
+      message.success('Las dimensiones se han actualizado exitosamente');
+      navigate('/dimensions');
+    } catch (error) {
+      message.error('Hubo un error al actualizar las dimensiones');
+    }
   };
+
+  if (loading) {
+    return <Spin tip="Cargando datos de la parcela..." />;
+  }
 
   if (!parcela) {
     return null;
   }
 
-  // Validación: Si la parcela tiene una siembra activa, no permitimos la edición
-  const tieneSiembraActiva = parcela.siembra_activa && parcela.siembra_activa.estado === 'activa';
+  // Validación: Si la parcela no está disponible, no permitimos la edición
+  const esParcelaDisponible = parcela.estado.toLowerCase() === 'disponible';
 
   return (
     <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, padding: '20px 40px' }}>
       {/* Formulario para editar dimensiones */}
-      {
-        <Form
-          form={form}
-          layout="vertical"
-          name="edit-dimensions"
-          onFinish={onFinish}
-          onValuesChange={handleDimensionChange}
-          style={{ marginBottom: 30 }}
-          disabled={tieneSiembraActiva}
+      <Form
+        form={form}
+        layout="vertical"
+        name="edit-dimensions"
+        onFinish={onFinish}
+        onValuesChange={handleDimensionChange}
+        style={{ marginBottom: 30 }}
+        disabled={!esParcelaDisponible} // Deshabilitar si no está disponible
+      >
+
+        {!esParcelaDisponible && (
+          <Alert
+            message="No es posible editar las dimensiones de una parcela que no está disponible."
+            type="error"
+            showIcon
+            style={{ marginBottom: 30 }}
+          />
+        )}
+
+        {/* Acordeones para información adicional de la parcela */}
+        <Collapse accordion style={{ marginBottom: '10px' }}>
+          <Panel header="Información General de la Parcela" key="1">
+            <Descriptions column={1} bordered>
+              <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
+              <Descriptions.Item label="Longitud (coordenadas)">{parcela.longitud}</Descriptions.Item>
+              <Descriptions.Item label="Latitud (coordenadas)">{parcela.latitud}</Descriptions.Item>
+              <Descriptions.Item label="Ubicación">{parcela.ubicacion}</Descriptions.Item>
+              <Descriptions.Item label="Estado de la Parcela">{parcela.estado}</Descriptions.Item>
+            </Descriptions>
+          </Panel>
+
+          <Panel header="Dimensiones Actuales" key="2">
+            <Descriptions column={1} bordered>
+              <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
+              <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
+              <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
+              <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
+            </Descriptions>
+          </Panel>
+        </Collapse>
+
+        <Form.Item
+          label="Superficie (hectáreas)"
+          name="superficie"
+          rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
         >
+          <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
+        </Form.Item>
 
-          {tieneSiembraActiva && (
-            <Alert
-              message="No es posible editar las dimensiones de una parcela con siembra activa."
-              type="error"
-              showIcon
-              style={{ marginBottom: 30 }}
-            />
-          )}
+        <Form.Item
+          label="Longitud (metros)"
+          name="longitud"
+          rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
+        >
+          <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
+        </Form.Item>
 
-          {/* Acordeones para información adicional de la parcela */}
-          <Collapse accordion style={{ marginBottom: '10px' }}>
-            <Panel header="Información General de la Parcela" key="1">
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
-                <Descriptions.Item label="Longitud (coordenadas)">{parcela.longitud}</Descriptions.Item>
-                <Descriptions.Item label="Latitud (coordenadas)">{parcela.latitud}</Descriptions.Item>
-                <Descriptions.Item label="Ubicación">{parcela.ubicacion}</Descriptions.Item>
-                <Descriptions.Item label="Estado de la Parcela">{parcela.estado}</Descriptions.Item>
-              </Descriptions>
-            </Panel>
+        <Form.Item
+          label="Anchura (metros)"
+          name="anchura"
+          rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
+        >
+          <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
+        </Form.Item>
 
-            <Panel header="Dimensiones Actuales" key="2">
-              <Descriptions column={1} bordered>
-                <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} metros</Descriptions.Item>
-                <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
-                <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
-                <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
-              </Descriptions>
-            </Panel>
-          </Collapse>
+        <Form.Item
+          label="Pendiente (%)"
+          name="pendiente"
+          rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
+        >
+          <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
+        </Form.Item>
 
-          <Form.Item
-            label="Superficie (hectáreas)"
-            name="superficie"
-            rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
-          >
-            <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
-          </Form.Item>
+        {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
 
-          <Form.Item
-            label="Longitud (metros)"
-            name="longitud"
-            rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
-          >
-            <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            label="Anchura (metros)"
-            name="anchura"
-            rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
-          >
-            <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            label="Pendiente (%)"
-            name="pendiente"
-            rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
-          >
-            <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
-          </Form.Item>
-
-          {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px' }}>
-              Guardar Cambios
-            </Button>
-          </Form.Item>
-        </Form>
-      }
+        <Form.Item>
+          <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px' }} disabled={!esParcelaDisponible}>
+            Guardar Cambios
+          </Button>
+        </Form.Item>
+      </Form>
     </Card>
   );
 };
