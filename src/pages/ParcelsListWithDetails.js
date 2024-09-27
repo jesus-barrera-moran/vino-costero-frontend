@@ -1,72 +1,36 @@
-import React from 'react';
-import { Table, Button, Space, Collapse, Descriptions, Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Button, Space, Collapse, Descriptions, Card, message, Spin } from 'antd';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'; // Íconos
 import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
-// Simulación de datos de parcelas existentes con el nuevo formato según la base de datos
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    longitud: '-70.123456',
-    latitud: '-33.456789',
-    ubicacion: 'Fundo El Olivo',
-    estado: 'Ocupada',
-    dimensiones: {
-      superficie: 10,
-      longitud: 500,
-      anchura: 200,
-      pendiente: 15,
-    },
-    siembra_activa: {
-      tipo_uva: 'Chardonnay',
-      fecha_plantacion: '2023-04-15',
-      cantidad_plantas: 500,
-      tecnica: 'Siembra directa',
-      observaciones: 'Observaciones de la siembra...',
-      estado: 'Activa',
-    },
-    control_tierra: {
-      ph: 6.5,
-      humedad: 35,
-      temperatura: 18,
-      observaciones: 'Suelo ideal para Chardonnay',
-    },
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    longitud: '-70.654321',
-    latitud: '-33.123456',
-    ubicacion: 'Fundo La Escondida',
-    estado: 'Ocupada',
-    dimensiones: {
-      superficie: 8,
-      longitud: 400,
-      anchura: 150,
-      pendiente: 12,
-    },
-    siembra_activa: {
-      tipo_uva: 'Pinot Noir',
-      fecha_plantacion: '2023-06-10',
-      cantidad_plantas: 300,
-      tecnica: 'Trasplante',
-      observaciones: 'Observaciones de la siembra...',
-      estado: 'Finalizada',
-    },
-    control_tierra: {
-      ph: 7,
-      humedad: 40,
-      temperatura: 20,
-      observaciones: 'Ideal para Sauvignon Blanc',
-    },
-  },
-];
-
 const ParcelsListWithDetails = () => {
   const navigate = useNavigate();
+  const [parcelas, setParcelas] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Función para obtener todas las parcelas desde el backend
+  const fetchParcelas = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/parcelas');
+      if (!response.ok) {
+        throw new Error('Error al obtener las parcelas');
+      }
+      const data = await response.json();
+      setParcelas(data);
+    } catch (error) {
+      message.error('Hubo un error al cargar las parcelas.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Llamamos a fetchParcelas al montar el componente
+  useEffect(() => {
+    fetchParcelas();
+  }, []);
 
   // Columnas para el listado de parcelas
   const columns = [
@@ -91,7 +55,7 @@ const ParcelsListWithDetails = () => {
       key: 'longitud',
     },
     {
-      title: 'Latituda',
+      title: 'Latitud',
       dataIndex: 'latitud',
       key: 'latitud',
     },
@@ -168,11 +132,11 @@ const ParcelsListWithDetails = () => {
           }
         >
           <Descriptions column={1} bordered>
-            <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
-            <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa.cantidad_plantas}</Descriptions.Item>
-            <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa.tecnica}</Descriptions.Item>
-            <Descriptions.Item label="Estado de la Siembra">{parcela.siembra_activa.estado}</Descriptions.Item>
-            <Descriptions.Item label="Observaciones">{parcela.siembra_activa.observaciones}</Descriptions.Item>
+            <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa?.tipo_uva}</Descriptions.Item>
+            <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa?.cantidad_plantas}</Descriptions.Item>
+            <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa?.tecnica}</Descriptions.Item>
+            <Descriptions.Item label="Estado de la Siembra">{parcela.siembra_activa?.estado}</Descriptions.Item>
+            <Descriptions.Item label="Observaciones">{parcela.siembra_activa?.observaciones}</Descriptions.Item>
           </Descriptions>
         </Panel>
 
@@ -192,10 +156,10 @@ const ParcelsListWithDetails = () => {
           }
         >
           <Descriptions column={1} bordered>
-            <Descriptions.Item label="PH de la Tierra">{parcela.control_tierra.ph}</Descriptions.Item>
-            <Descriptions.Item label="Humedad">{parcela.control_tierra.humedad}%</Descriptions.Item>
-            <Descriptions.Item label="Temperatura">{parcela.control_tierra.temperatura}°C</Descriptions.Item>
-            <Descriptions.Item label="Observaciones">{parcela.control_tierra.observaciones}</Descriptions.Item>
+            <Descriptions.Item label="PH de la Tierra">{parcela.control_tierra?.ph}</Descriptions.Item>
+            <Descriptions.Item label="Humedad">{parcela.control_tierra?.humedad}%</Descriptions.Item>
+            <Descriptions.Item label="Temperatura">{parcela.control_tierra?.temperatura}°C</Descriptions.Item>
+            <Descriptions.Item label="Observaciones">{parcela.control_tierra?.observaciones}</Descriptions.Item>
           </Descriptions>
         </Panel>
       </Collapse>
@@ -207,14 +171,18 @@ const ParcelsListWithDetails = () => {
       <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-parcel')}>
         Registrar Nueva Parcela
       </Button>
-      <Table
-        columns={columns}
-        dataSource={parcelasExistentes}
-        rowKey="id"
-        expandable={{
-          expandedRowRender: (record) => expandedRowRender(record),
-        }}
-      />
+      {loading ? (
+        <Spin tip="Cargando parcelas..." />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={parcelas}
+          rowKey="id"
+          expandable={{
+            expandedRowRender: (record) => expandedRowRender(record),
+          }}
+        />
+      )}
     </Card>
   );
 };
