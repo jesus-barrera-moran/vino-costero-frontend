@@ -1,51 +1,8 @@
-import React from 'react';
-import { Table, Card, Collapse, Descriptions, Timeline, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, Card, Collapse, Descriptions, Timeline, Button, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
-
-// Simulación de datos de parcelas con dimensiones y su historial
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    dimensionesActuales: {
-      superficie: 10,  // En hectáreas
-      longitud: 500,   // En metros
-      anchura: 200,    // En metros
-      pendiente: 15,
-      fecha: '2023-05-01',
-    },
-    historialDimensiones: [
-      {
-        superficie: 8,
-        longitud: 400,
-        anchura: 180,
-        pendiente: 12,
-        fecha: '2023-05-15',
-      },
-      {
-        superficie: 9,
-        longitud: 450,
-        anchura: 190,
-        pendiente: 14,
-        fecha: '2023-07-01',
-      },
-    ],
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    dimensionesActuales: {
-      superficie: 8,  // En hectáreas
-      longitud: 400,  // En metros
-      anchura: 150,   // En metros
-      pendiente: 12,
-      fecha: '2023-04-15',
-    },
-    historialDimensiones: [],
-  },
-];
 
 // Función para calcular el área ocupada (longitud * anchura en metros cuadrados)
 const calcularAreaOcupada = (longitud, anchura) => {
@@ -59,7 +16,31 @@ const calcularPorcentajeOcupado = (areaOcupada, superficieTotal) => {
 };
 
 const ParcelDimensionsOverview = () => {
+  const [parcelas, setParcelas] = useState([]);
+  const [loading, setLoading] = useState(false); // Estado de carga
   const navigate = useNavigate();
+
+  // Función para cargar las dimensiones de las parcelas desde el backend
+  const fetchParcelas = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/dimensiones'); // Ajusta la URL si es necesario
+      if (!response.ok) {
+        throw new Error('Error al obtener las dimensiones');
+      }
+      const data = await response.json();
+      setParcelas(data);
+    } catch (error) {
+      message.error('Hubo un error al cargar las dimensiones de las parcelas.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Llamar a fetchParcelas al montar el componente
+  useEffect(() => {
+    fetchParcelas();
+  }, []);
 
   // Columnas para el listado de parcelas con dimensiones actuales
   const columns = [
@@ -151,14 +132,18 @@ const ParcelDimensionsOverview = () => {
 
   return (
     <Card title="Visualización de Dimensiones de Parcelas" bordered={false} style={{ marginTop: 20 }}>
-      <Table
-        columns={columns}
-        dataSource={parcelasExistentes}
-        rowKey="id"
-        expandable={{
-          expandedRowRender: (record) => expandedRowRender(record),
-        }}
-      />
+      {loading ? (
+        <Spin tip="Cargando dimensiones..." />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={parcelas}
+          rowKey="id"
+          expandable={{
+            expandedRowRender: (record) => expandedRowRender(record),
+          }}
+        />
+      )}
     </Card>
   );
 };
