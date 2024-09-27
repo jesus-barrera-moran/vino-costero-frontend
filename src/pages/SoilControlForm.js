@@ -1,91 +1,93 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse } from 'antd';
-import { useParams } from 'react-router-dom';
+import { Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse, Spin } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
-// Simulación de datos de parcelas existentes
-const parcelasExistentes = [
-  {
-    id: 1,
-    nombre: 'Parcela 1',
-    longitud: '123.456',
-    latitud: '456.789',
-    ubicacion: 'Valle de Casablanca',
-    estado: 'disponible',
-    dimensionesActuales: {
-      superficie: 10,
-      longitud: 500,
-      anchura: 200,
-      pendiente: 15,
-    },
-    ultimoControlTierra: {
-      ph: 6.5,
-      humedad: 35,
-      temperatura: 15,
-      observaciones: 'Condiciones normales',
-    },
-  },
-  {
-    id: 2,
-    nombre: 'Parcela 2',
-    longitud: '123.456',
-    latitud: '456.789',
-    ubicacion: 'Valle de Casablanca',
-    estado: 'disponible',
-    dimensionesActuales: {
-      superficie: 8,
-      longitud: 400,
-      anchura: 150,
-      pendiente: 12,
-    },
-    ultimoControlTierra: {
-      ph: 6.8,
-      humedad: 38,
-      temperatura: 18,
-      observaciones: 'Condiciones óptimas',
-    },
-  },
-];
-
 const RegisterSoilControl = () => {
   const [form] = Form.useForm();
+  const [parcelas, setParcelas] = useState([]);
   const [selectedParcela, setSelectedParcela] = useState(null);
+  const [loading, setLoading] = useState(true); // Estado de carga
   const { id } = useParams(); // Capturar ID si venimos desde el botón "Crear Control" específico de una parcela
+  const navigate = useNavigate();
 
-  // Preseleccionar la parcela si venimos desde una específica
-  useEffect(() => {
-    if (id) {
-      const parcela = parcelasExistentes.find((p) => p.id === parseInt(id));
-      if (parcela) {
-        setSelectedParcela(parcela);
+  // Obtener las parcelas desde el endpoint
+  const fetchParcelas = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/parcelas'); // Ajustar la URL si es necesario
+      if (!response.ok) {
+        throw new Error('Error al obtener las parcelas');
       }
+      const data = await response.json();
+      setParcelas(data);
+
+      // Si venimos desde una parcela específica, la seleccionamos automáticamente
+      if (id) {
+        const parcela = data.find((p) => p.id === parseInt(id));
+        if (parcela) {
+          setSelectedParcela(parcela);
+        }
+      }
+      setLoading(false); // Detener el estado de carga cuando se obtienen los datos
+    } catch (error) {
+      message.error('Error al cargar las parcelas.');
+      setLoading(false); // Detener el estado de carga si hay un error
     }
+  };
+
+  useEffect(() => {
+    fetchParcelas();
   }, [id]);
 
   // Manejar el cambio de parcela seleccionada (cuando es general)
   const handleParcelaChange = (value) => {
-    const parcela = parcelasExistentes.find((p) => p.id === value);
+    const parcela = parcelas.find((p) => p.id === value);
     setSelectedParcela(parcela);
   };
 
   // Al completar el formulario
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     if (!selectedParcela) {
       message.error('Por favor, seleccione una parcela.');
       return;
     }
 
-    // Guardar el nuevo control de tierra
-    console.log('Control de Tierra registrado:', {
-      parcela: selectedParcela.nombre,
-      control: values,
-    });
+    try {
+      const response = await fetch(`http://localhost:3000/controlesTierra/${selectedParcela.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ph_tierra: values.ph,
+          condiciones_humedad: values.humedad,
+          condiciones_temperatura: values.temperatura,
+          observaciones: values.observaciones,
+        }),
+      });
 
-    message.success('El control de tierra ha sido registrado exitosamente');
-    form.resetFields();
-    setSelectedParcela(null);
+      if (!response.ok) {
+        throw new Error('Error al registrar el control de tierra');
+      }
+
+      message.success('El control de tierra ha sido registrado exitosamente');
+      form.resetFields();
+      setSelectedParcela(null);
+      navigate('/soil-controls'); // Redirigir al listado de parcelas
+    } catch (error) {
+      message.error('Error al registrar el control de tierra.');
+    }
   };
+
+  if (loading) {
+    // Mostrar indicador de carga mientras los datos se están obteniendo
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando parcelas..." />
+      </div>
+    );
+  }
 
   return (
     <Card title="Registrar Control de Tierra" bordered={false} style={{ marginTop: 20 }}>
@@ -106,7 +108,7 @@ const RegisterSoilControl = () => {
               placeholder="Seleccione una parcela"
               onChange={handleParcelaChange}
             >
-              {parcelasExistentes.map((parcela) => (
+              {parcelas.map((parcela) => (
                 <Select.Option key={parcela.id} value={parcela.id}>
                   {parcela.nombre}
                 </Select.Option>
@@ -130,10 +132,10 @@ const RegisterSoilControl = () => {
 
             <Panel header="Último Control de Tierra" key="2">
               <Descriptions bordered column={1}>
-                <Descriptions.Item label="PH">{selectedParcela.ultimoControlTierra.ph}</Descriptions.Item>
-                <Descriptions.Item label="Humedad">{selectedParcela.ultimoControlTierra.humedad}%</Descriptions.Item>
-                <Descriptions.Item label="Temperatura">{selectedParcela.ultimoControlTierra.temperatura}°C</Descriptions.Item>
-                <Descriptions.Item label="Observaciones">{selectedParcela.ultimoControlTierra.observaciones}</Descriptions.Item>
+                <Descriptions.Item label="PH">{selectedParcela.control_tierra?.ph || 'N/A'}</Descriptions.Item>
+                <Descriptions.Item label="Humedad">{selectedParcela.control_tierra?.humedad || 'N/A'}%</Descriptions.Item>
+                <Descriptions.Item label="Temperatura">{selectedParcela.control_tierra?.temperatura || 'N/A'}°C</Descriptions.Item>
+                <Descriptions.Item label="Observaciones">{selectedParcela.control_tierra?.observaciones || 'N/A'}</Descriptions.Item>
               </Descriptions>
             </Panel>
           </Collapse>
