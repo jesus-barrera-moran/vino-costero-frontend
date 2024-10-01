@@ -47,9 +47,15 @@ const ParcelForm = () => {
 
   // Cargar los datos de la parcela si estamos en modo de edición
   useEffect(() => {
+    const token = localStorage.getItem('token'); // Obtener el token del localStorage
     if (isEditing) {
       setLoadingData(true);
-      fetch(`http://localhost:3000/parcelas/${id}`) // Ajusta la URL según tu configuración
+      fetch(`http://localhost:3000/parcelas/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Incluir el token en la cabecera de autorización
+          'Content-Type': 'application/json',
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           form.setFieldsValue({
@@ -72,6 +78,7 @@ const ParcelForm = () => {
 
   // Función para manejar el submit del formulario
   const onFinish = async (values) => {
+    const token = localStorage.getItem('token'); // Obtener el token del localStorage
     const url = isEditing
       ? `http://localhost:3000/parcelas/${id}` // Para editar
       : 'http://localhost:3000/parcelas'; // Para crear
@@ -85,6 +92,7 @@ const ParcelForm = () => {
         method: method,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Incluir el token en la cabecera de autorización
         },
         body: JSON.stringify({
           nombre_parcela: values.nombre,
