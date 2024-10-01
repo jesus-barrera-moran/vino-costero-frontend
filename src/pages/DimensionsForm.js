@@ -9,6 +9,12 @@ const calcularAreaOcupada = (longitud, anchura) => {
   return (longitud * anchura) / 10000; // Convertir de m² a hectáreas
 };
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const EditParcelDimensions = () => {
   const { id } = useParams();
   const [form] = Form.useForm();
@@ -19,10 +25,37 @@ const EditParcelDimensions = () => {
   const [porcentajeOcupado, setPorcentajeOcupado] = useState(0);
   const [warning, setWarning] = useState('');
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_02
+  const canEdit = checkPermission([1, 3]);
+  const canView = checkPermission([1, 3, 5]);
+
+  // Redirigir si no tienen permiso para ver
+  useEffect(() => {
+    if (!canView) {
+      message.error('No tiene permisos para ver esta página');
+      navigate('/');
+    }
+  }, [canView, navigate]);
+
   // Función para obtener los detalles de la parcela desde el backend
   const fetchParcela = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/parcelas/${id}`);
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
+      const response = await fetch(`http://localhost:3000/parcelas/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+          'Content-Type': 'application/json',
+        },
+      });
       if (!response.ok) {
         throw new Error('Error al obtener los detalles de la parcela');
       }
@@ -72,10 +105,12 @@ const EditParcelDimensions = () => {
   // Función para manejar el envío del formulario
   const onFinish = async (values) => {
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const response = await fetch(`http://localhost:3000/dimensiones/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
         },
         body: JSON.stringify({
           superficie: values.superficie,
@@ -116,7 +151,7 @@ const EditParcelDimensions = () => {
         onFinish={onFinish}
         onValuesChange={handleDimensionChange}
         style={{ marginBottom: 30 }}
-        disabled={!esParcelaDisponible} // Deshabilitar si no está disponible
+        disabled={!canEdit || !esParcelaDisponible} // Deshabilitar si no tiene permisos o la parcela no está disponible
       >
 
         {!esParcelaDisponible && (
@@ -185,7 +220,7 @@ const EditParcelDimensions = () => {
         {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px' }} disabled={!esParcelaDisponible}>
+          <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px' }} disabled={!canEdit || !esParcelaDisponible}>
             Guardar Cambios
           </Button>
         </Form.Item>

@@ -15,16 +15,49 @@ const calcularPorcentajeOcupado = (areaOcupada, superficieTotal) => {
   return ((areaOcupada / superficieTotal) * 100).toFixed(2); // Redondear a 2 decimales
 };
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const ParcelDimensionsOverview = () => {
   const [parcelas, setParcelas] = useState([]);
   const [loading, setLoading] = useState(false); // Estado de carga
   const navigate = useNavigate();
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_02
+  const canEdit = checkPermission([1, 3]);
+  const canView = checkPermission([1, 3, 5]);
+
+  // Redirigir si no tienen permiso para ver
+  useEffect(() => {
+    if (!canView) {
+      message.error('No tiene permisos para ver esta página');
+      navigate('/');
+    }
+  }, [canView, navigate]);
+
   // Función para cargar las dimensiones de las parcelas desde el backend
   const fetchParcelas = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/dimensiones'); // Ajusta la URL si es necesario
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
+      const response = await fetch('http://localhost:3000/dimensiones', {
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+          'Content-Type': 'application/json',
+        },
+      }); // Ajusta la URL si es necesario
       if (!response.ok) {
         throw new Error('Error al obtener las dimensiones');
       }
@@ -73,12 +106,14 @@ const ParcelDimensionsOverview = () => {
       title: 'Acciones',
       key: 'acciones',
       render: (record) => (
-        <Button
-          type="primary"
-          onClick={() => navigate(`/edit-dimensions/${record.id}`)}
-        >
-          Editar
-        </Button>
+        canEdit && (
+          <Button
+            type="primary"
+            onClick={() => navigate(`/edit-dimensions/${record.id}`)}
+          >
+            Editar
+          </Button>
+        )
       ),
     },
   ];
