@@ -11,7 +11,7 @@ const Login = () => {
     setLoading(true);
     try {
       // Petición al backend para autenticar usuario
-      const response = await axios.post('http://localhost:3000/login', {
+      const response = await axios.post('http://localhost:3000/auth/login', {
         username: values.usuario,
         password: values.contrasena,
       });
@@ -19,10 +19,11 @@ const Login = () => {
       if (response.data.token) {
         // Guardar el token JWT en localStorage
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('roles', response.data.roles);
 
         // Mensaje de éxito y redirección
         message.success('Inicio de sesión exitoso');
-        navigate('/'); // Redirigir al dashboard o la pantalla principal
+        navigate('/parcels'); // Redirigir al dashboard o la pantalla principal
       } else {
         message.error('Nombre de usuario o contraseña incorrectos');
       }

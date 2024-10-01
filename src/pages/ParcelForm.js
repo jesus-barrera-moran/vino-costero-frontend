@@ -8,6 +8,12 @@ const { Option } = Select;
 // Estados disponibles para la parcela
 const estadosParcelas = ['Disponible', 'Ocupada'];
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const ParcelForm = () => {
   const [form] = Form.useForm();
   const { id } = useParams(); // Para identificar si estamos editando o creando
@@ -16,6 +22,28 @@ const ParcelForm = () => {
   const [loading, setLoading] = useState(false); // Estado de carga para la petición
   const [loadingData, setLoadingData] = useState(false); // Estado de carga para los datos de la parcela
   const isEditing = Boolean(id); // Si hay un id en la URL, estamos editando
+
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Verificar permisos basados en el CU_01
+  const canCreate = checkPermission([1, 2, 3, 4]); // Administrador del Sistema, Gestor de Producción, Supervisor de Campo
+  const canEdit = checkPermission([1, 2, 3, 4]);      // Administrador del Sistema, Gestor de Producción
+  const canView = checkPermission([1, 2, 3, 4, 5]); // Todos pueden consultar
+
+  // Redirigir si no tienen permiso para ver
+  useEffect(() => {
+    if (!canView) {
+      message.error('No tiene permisos para ver esta página');
+      navigate('/');
+    }
+  }, [canView, navigate]);
 
   // Cargar los datos de la parcela si estamos en modo de edición
   useEffect(() => {
@@ -108,7 +136,7 @@ const ParcelForm = () => {
             name="nombre"
             rules={[{ required: true, message: 'Por favor, ingrese el nombre de la parcela' }]}
           >
-            <Input placeholder="Nombre de la parcela" />
+            <Input placeholder="Nombre de la parcela" disabled={isEditing && !canEdit} />
           </Form.Item>
 
           <Form.Item
@@ -116,7 +144,7 @@ const ParcelForm = () => {
             name="longitud"
             rules={[{ required: true, message: 'Por favor, ingrese la longitud (coordenadas) de la parcela' }]}
           >
-            <Input placeholder="Longitud" />
+            <Input placeholder="Longitud" disabled={isEditing && !canEdit} />
           </Form.Item>
 
           <Form.Item
@@ -124,7 +152,7 @@ const ParcelForm = () => {
             name="latitud"
             rules={[{ required: true, message: 'Por favor, ingrese la latitud (coordenadas) de la parcela' }]}
           >
-            <Input placeholder="Latitud" />
+            <Input placeholder="Latitud" disabled={isEditing && !canEdit} />
           </Form.Item>
 
           <Form.Item
@@ -132,7 +160,7 @@ const ParcelForm = () => {
             name="ubicacion"
             rules={[{ required: true, message: 'Por favor, ingrese la ubicación de la parcela' }]}
           >
-            <Input placeholder="Descripción de la ubicación" />
+            <Input placeholder="Descripción de la ubicación" disabled={isEditing && !canEdit} />
           </Form.Item>
 
           {/* Dropdown para cambiar el estado de la parcela */}
@@ -141,7 +169,7 @@ const ParcelForm = () => {
             name="estado_parcela"
             rules={[{ required: true, message: 'Por favor, seleccione el estado de la parcela' }]}
           >
-            <Select placeholder="Seleccione el estado de la parcela">
+            <Select placeholder="Seleccione el estado de la parcela" disabled={isEditing && !canEdit}>
               {estadosParcelas.map((estado) => (
                 <Option key={estado} value={estado}>
                   {estado}
@@ -187,7 +215,7 @@ const ParcelForm = () => {
             </Panel>
 
             {/* Sección de Control de Tierra */}
-            {!isEditing && (
+            {!isEditing && canCreate && (
               <Panel header="Control de Tierra" key="2">
                 <Form.Item
                   label="PH de la tierra"
@@ -221,7 +249,7 @@ const ParcelForm = () => {
           </Collapse>
 
           <Form.Item style={{ marginTop: 20 }}>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={loading} disabled={!canCreate && !canEdit}>
               {isEditing ? 'Actualizar Parcela' : 'Registrar Parcela'}
             </Button>
           </Form.Item>
