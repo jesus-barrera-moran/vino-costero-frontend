@@ -4,15 +4,49 @@ import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const ParcelSoilControlOverview = () => {
   const navigate = useNavigate();
   const [parcelas, setParcelas] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_03
+  const canCreate = checkPermission([1, 3]);
+  const canView = checkPermission([1, 3, 5]);
+
+  // Redirigir si no tienen permiso para ver
+  useEffect(() => {
+    if (!canView) {
+      message.error('No tiene permisos para ver esta página');
+      navigate('/');
+    }
+  }, [canView, navigate]);
+
   // Función para obtener las parcelas y sus controles de tierra desde el backend
   const fetchParcelas = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/controlesTierra'); // Ajustar la URL según tu backend
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
+      const response = await fetch('http://localhost:3000/controlesTierra', {
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+          'Content-Type': 'application/json',
+        },
+      }); // Ajustar la URL según tu backend
       if (!response.ok) {
         throw new Error('Error al obtener los controles de tierra');
       }
@@ -50,12 +84,14 @@ const ParcelSoilControlOverview = () => {
       title: 'Acciones',
       key: 'acciones',
       render: (record) => (
-        <Button
-          type="primary"
-          onClick={() => navigate(`/create-soil-control/${record.id}`)}
-        >
-          Crear Control
-        </Button>
+        canCreate && (
+          <Button
+            type="primary"
+            onClick={() => navigate(`/create-soil-control/${record.id}`)}
+          >
+            Crear Control
+          </Button>
+        )
       ),
     },
   ];
@@ -108,9 +144,11 @@ const ParcelSoilControlOverview = () => {
 
   return (
     <Card title="Visualización de Parcelas y Controles de Tierra" bordered={false} style={{ marginTop: 20 }}>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-soil-control')}>
-        Crear Control de Tierra
-      </Button>
+      {canCreate && (
+        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-soil-control')}>
+          Crear Control de Tierra
+        </Button>
+      )}
       <Table
         columns={columns}
         dataSource={parcelas}

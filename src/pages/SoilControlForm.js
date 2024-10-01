@@ -4,6 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const RegisterSoilControl = () => {
   const [form] = Form.useForm();
   const [parcelas, setParcelas] = useState([]);
@@ -12,10 +18,37 @@ const RegisterSoilControl = () => {
   const { id } = useParams(); // Capturar ID si venimos desde el botón "Crear Control" específico de una parcela
   const navigate = useNavigate();
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_03
+  const canCreate = checkPermission([1, 3]);
+
+  // Redirigir si no tienen permiso para crear
+  useEffect(() => {
+    if (!canCreate) {
+      message.error('No tiene permisos para registrar controles de tierra');
+      navigate('/');
+    }
+  }, [canCreate, navigate]);
+
   // Obtener las parcelas desde el endpoint
   const fetchParcelas = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/parcelas'); // Ajustar la URL si es necesario
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
+      const response = await fetch('http://localhost:3000/parcelas', {
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+          'Content-Type': 'application/json',
+        },
+      }); // Ajustar la URL si es necesario
       if (!response.ok) {
         throw new Error('Error al obtener las parcelas');
       }
@@ -54,10 +87,12 @@ const RegisterSoilControl = () => {
     }
 
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const response = await fetch(`http://localhost:3000/controlesTierra/${selectedParcela.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
         },
         body: JSON.stringify({
           ph_tierra: values.ph,
@@ -74,7 +109,7 @@ const RegisterSoilControl = () => {
       message.success('El control de tierra ha sido registrado exitosamente');
       form.resetFields();
       setSelectedParcela(null);
-      navigate('/soil-controls'); // Redirigir al listado de parcelas
+      navigate('/soil-controls'); // Redirigir al listado de controles de tierra
     } catch (error) {
       message.error('Error al registrar el control de tierra.');
     }
