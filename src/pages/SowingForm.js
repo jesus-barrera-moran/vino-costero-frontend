@@ -6,6 +6,12 @@ import moment from 'moment';
 const { Option } = Select;
 const { Panel } = Collapse;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const CreateOrEditSowing = () => {
   const [form] = Form.useForm();
   const { id } = useParams(); // ID de la siembra o parcela
@@ -18,10 +24,36 @@ const CreateOrEditSowing = () => {
   const [loading, setLoading] = useState(true); // Estado de carga
   const navigate = useNavigate();
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_05
+  const canCreateOrEdit = checkPermission([1, 2, 3, 4]); // Administrador del Sistema, Gestor de Producción, Supervisor de Campo, Operador de Campo
+
+  // Redirigir si no tienen permiso para crear o editar
+  useEffect(() => {
+    if (!canCreateOrEdit) {
+      message.error('No tiene permisos para realizar esta acción');
+      navigate('/');
+    }
+  }, [canCreateOrEdit, navigate]);
+
   useEffect(() => {
     const fetchParcelas = async () => {
       try {
-        const response = await fetch('http://localhost:3000/parcelas');
+        const token = localStorage.getItem('token'); // Obtener el token del localStorage
+        const response = await fetch('http://localhost:3000/parcelas', {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+            'Content-Type': 'application/json',
+          },
+        });
         const data = await response.json();
         const parcelasDisponibles = !window.location.pathname.includes('edit-sowing') ? data.filter(parcela => !parcela.siembra_activa) : data;
         setParcelas(parcelasDisponibles);
@@ -29,8 +61,8 @@ const CreateOrEditSowing = () => {
         if (window.location.pathname.includes('edit-sowing')) {
           setIsEditMode(true);
           await fetchSiembra(parcelasDisponibles);
-          await fetchTiposDeUva();
         }
+        await fetchTiposDeUva();
       } catch (error) {
         message.error('Error al cargar las parcelas');
       } finally {
@@ -40,7 +72,13 @@ const CreateOrEditSowing = () => {
   
     const fetchTiposDeUva = async () => {
       try {
-        const response = await fetch('http://localhost:3000/tiposUvas');
+        const token = localStorage.getItem('token'); // Obtener el token del localStorage
+        const response = await fetch('http://localhost:3000/tiposUvas', {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+            'Content-Type': 'application/json',
+          },
+        });
         const data = await response.json();
         setTiposDeUva(data);
   
@@ -56,7 +94,13 @@ const CreateOrEditSowing = () => {
   
     const fetchSiembra = async (parcelasDisponibles) => {
       try {
-        const response = await fetch(`http://localhost:3000/siembras/${id}`);
+        const token = localStorage.getItem('token'); // Obtener el token del localStorage
+        const response = await fetch(`http://localhost:3000/siembras/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+            'Content-Type': 'application/json',
+          },
+        });
         const siembraData = await response.json();
         setSiembra(siembraData);
   
@@ -95,6 +139,7 @@ const CreateOrEditSowing = () => {
   };
 
   const onFinish = async (values) => {
+    const token = localStorage.getItem('token'); // Obtener el token del localStorage
     const url = isEditMode
       ? `http://localhost:3000/siembras/${id}` // Para actualizar siembra existente
       : 'http://localhost:3000/siembras'; // Para crear una nueva siembra
@@ -105,6 +150,7 @@ const CreateOrEditSowing = () => {
         method: method,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
         },
         body: JSON.stringify({
           id_parcela: values.parcela,

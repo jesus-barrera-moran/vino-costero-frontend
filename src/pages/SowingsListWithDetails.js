@@ -5,15 +5,49 @@ import { EditOutlined } from '@ant-design/icons'; // Íconos
 
 const { Panel } = Collapse;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const ParcelSowingOverview = () => {
   const navigate = useNavigate();
   const [parcelas, setParcelas] = useState([]);
   const [loading, setLoading] = useState(true); // Para mostrar el estado de carga
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_05
+  const canCreateOrEdit = checkPermission([1, 2, 3, 4]);
+  const canView = checkPermission([1, 2, 3, 4, 5]);
+
+  // Redirigir si no tienen permiso para ver
+  useEffect(() => {
+    if (!canView) {
+      message.error('No tiene permisos para ver esta página');
+      navigate('/');
+    }
+  }, [canView, navigate]);
+
   // Función para obtener las parcelas con siembras activas e historiales de siembra
   const fetchParcelas = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/siembras'); // Ajustar la URL según el backend
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
+      const response = await fetch('http://localhost:3000/siembras', {
+        headers: {
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+          'Content-Type': 'application/json',
+        },
+      }); // Ajustar la URL según el backend
       if (!response.ok) {
         throw new Error('Error al obtener las parcelas con siembras');
       }
@@ -52,14 +86,16 @@ const ParcelSowingOverview = () => {
       title: 'Acciones',
       key: 'acciones',
       render: (parcela) => (
-        <Button
-          type="default"
-          icon={<EditOutlined />}
-          style={{ color: '#52c41a' }} // Verde para la siembra
-          onClick={() => navigate(`/edit-sowing/${parcela.id}`)}
-        >
-          Editar
-        </Button>
+        canCreateOrEdit && (
+          <Button
+            type="default"
+            icon={<EditOutlined />}
+            style={{ color: '#52c41a' }} // Verde para la siembra
+            onClick={() => navigate(`/edit-sowing/${parcela.id}`)}
+          >
+            Editar
+          </Button>
+        )
       ),
     },
   ];
@@ -123,9 +159,11 @@ const ParcelSowingOverview = () => {
 
   return (
     <Card title="Visualización de Parcelas y Siembras" bordered={false} style={{ marginTop: 20 }}>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-sowing')}>
-        Registrar Nueva Siembra
-      </Button>
+      {canCreateOrEdit && (
+        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-sowing')}>
+          Registrar Nueva Siembra
+        </Button>
+      )}
       <Table
         columns={columns}
         dataSource={parcelas}
