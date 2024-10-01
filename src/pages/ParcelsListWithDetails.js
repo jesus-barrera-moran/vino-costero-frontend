@@ -5,17 +5,51 @@ import { useNavigate } from 'react-router-dom';
 
 const { Panel } = Collapse;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const ParcelsListWithDetails = () => {
   const navigate = useNavigate();
   const [parcelas, setParcelas] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en roles
+  const canCreate = checkPermission([1, 3]);
+  const canEdit = checkPermission([1, 3]);
+  const canView = checkPermission([1, 3, 5]);
+
+  // Redirigir si no tienen permiso para ver
+  useEffect(() => {
+    if (!canView) {
+      message.error('No tiene permisos para ver esta página');
+      navigate('/');
+    }
+  }, [canView, navigate]);
 
   // Función para obtener todas las parcelas desde el backend
   const fetchParcelas = async () => {
     if (!loading) {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:3000/parcelas');
+        const token = localStorage.getItem('token'); // Obtener el token
+        const response = await fetch('http://localhost:3000/parcelas', {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+            'Content-Type': 'application/json',
+          },
+        });
         if (!response.ok) {
           throw new Error('Error al obtener las parcelas');
         }
@@ -66,9 +100,11 @@ const ParcelsListWithDetails = () => {
       key: 'acciones',
       render: (text, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => handleEdit(record.id)}>
-            Editar
-          </Button>
+          {canEdit && (
+            <Button type="primary" onClick={() => handleEdit(record.id)}>
+              Editar
+            </Button>
+          )}
         </Space>
       ),
     },
@@ -76,7 +112,9 @@ const ParcelsListWithDetails = () => {
 
   // Función para manejar la redirección al formulario de edición
   const handleEdit = (id) => {
-    navigate(`/edit-parcel/${id}`);
+    if (canEdit) {
+      navigate(`/edit-parcel/${id}`);
+    }
   };
 
   const handleEditDimensions = (id) => {
@@ -103,7 +141,7 @@ const ParcelsListWithDetails = () => {
         <Panel
           header="Dimensiones"
           key="1"
-          extra={
+          extra={canEdit && (
             <Button
               type="default"
               icon={<EditOutlined />}
@@ -112,7 +150,7 @@ const ParcelsListWithDetails = () => {
             >
               Editar
             </Button>
-          }
+          )}
         >
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
@@ -127,16 +165,16 @@ const ParcelsListWithDetails = () => {
           <Panel
             header="Siembra Activa"
             key="2"
-            extra={
+            extra={canEdit && (
               <Button
                 type="default"
                 icon={<EditOutlined />}
-                style={{ color: '#52c41a' }} 
+                style={{ color: '#52c41a' }}
                 onClick={() => handleEditSiembra(parcela.id)}
               >
                 Editar
               </Button>
-            }
+            )}
           >
             <Descriptions column={1} bordered>
               <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
@@ -158,14 +196,16 @@ const ParcelsListWithDetails = () => {
               type="warning"
               showIcon
             />
-            <Button
-              type="primary"
-              style={{ marginTop: 10 }}
-              icon={<PlusOutlined />}
-              onClick={() => handleCreateSiembra(parcela.id)}
-            >
-              Crear nueva siembra
-            </Button>
+            {canCreate && (
+              <Button
+                type="primary"
+                style={{ marginTop: 10 }}
+                icon={<PlusOutlined />}
+                onClick={() => handleCreateSiembra(parcela.id)}
+              >
+                Crear nueva siembra
+              </Button>
+            )}
           </Panel>
         )}
 
@@ -173,7 +213,7 @@ const ParcelsListWithDetails = () => {
         <Panel
           header="Control de Tierra"
           key="3"
-          extra={
+          extra={canCreate && (
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -182,7 +222,7 @@ const ParcelsListWithDetails = () => {
             >
               Crear
             </Button>
-          }
+          )}
         >
           <Descriptions column={1} bordered>
             <Descriptions.Item label="PH de la Tierra">{parcela.control_tierra?.ph}</Descriptions.Item>
@@ -197,9 +237,11 @@ const ParcelsListWithDetails = () => {
 
   return (
     <Card title="Listado de Parcelas" bordered={false} style={{ marginTop: 20 }}>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-parcel')}>
-        Registrar Nueva Parcela
-      </Button>
+      {canCreate && (
+        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-parcel')}>
+          Registrar Nueva Parcela
+        </Button>
+      )}
       {loading ? (
         <Spin tip="Cargando parcelas..." />
       ) : (

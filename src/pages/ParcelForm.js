@@ -33,9 +33,9 @@ const ParcelForm = () => {
   }, [navigate]);
 
   // Verificar permisos basados en el CU_01
-  const canCreate = checkPermission([1, 2, 3, 4]); // Administrador del Sistema, Gestor de Producción, Supervisor de Campo
-  const canEdit = checkPermission([1, 2, 3, 4]);      // Administrador del Sistema, Gestor de Producción
-  const canView = checkPermission([1, 2, 3, 4, 5]); // Todos pueden consultar
+  const canCreate = checkPermission([1, 3]);
+  const canEdit = checkPermission([1, 3]);
+  const canView = checkPermission([1, 3, 5]);
 
   // Redirigir si no tienen permiso para ver
   useEffect(() => {
