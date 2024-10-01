@@ -5,6 +5,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 const { Option } = Select;
 const { Panel } = Collapse;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const CreateOrEditGrapeType = () => {
   const { id } = useParams(); // Captura el ID del tipo de uva si es edición
   const [form] = Form.useForm();
@@ -14,14 +20,41 @@ const CreateOrEditGrapeType = () => {
   const [selectedParcels, setSelectedParcels] = useState([]); // Estado para las parcelas seleccionadas
   const [loading, setLoading] = useState(true);
 
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    }
+  }, [navigate]);
+
+  // Permisos basados en CU_04
+  const canCreateOrEdit = checkPermission([1, 2]);
+
+  // Redirigir si no tienen permiso para crear o editar
+  useEffect(() => {
+    if (!canCreateOrEdit) {
+      message.error('No tiene permisos para realizar esta acción');
+      navigate('/');
+    }
+  }, [canCreateOrEdit, navigate]);
+
   // Cargar los datos de parcelas y del tipo de uva si es edición
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem('token'); // Obtener el token del localStorage
+
         // Obtener todas las parcelas
-        const parcelasResponse = await fetch('http://localhost:3000/parcelas');
+        const parcelasResponse = await fetch('http://localhost:3000/parcelas', {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+            'Content-Type': 'application/json',
+          },
+        });
         const parcelasData = await parcelasResponse.json();
-  
+
         // Filtrar solo las parcelas que tengan siembra activa sin un tipo de uva asignado
         const parcelasFiltradas = !id && parcelasData.filter((parcela) => {
           return (
@@ -29,12 +62,17 @@ const CreateOrEditGrapeType = () => {
             !parcela.siembra_activa.tipo_uva // No tiene tipo de uva asignado
           );
         });
-  
+
         setParcelas(id ? parcelasData : parcelasFiltradas);
-  
+
         if (id) {
           // Si hay un ID en la URL, estamos en modo de edición
-          const tipoUvaResponse = await fetch(`http://localhost:3000/tiposUvas/${id}`);
+          const tipoUvaResponse = await fetch(`http://localhost:3000/tiposUvas/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
+              'Content-Type': 'application/json',
+            },
+          });
           const tipoUvaData = await tipoUvaResponse.json();
           setIsEditMode(true);
           form.setFieldsValue({
@@ -59,6 +97,7 @@ const CreateOrEditGrapeType = () => {
 
   const onFinish = async (values) => {
     try {
+      const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const url = isEditMode
         ? `http://localhost:3000/tiposUvas/${id}`
         : 'http://localhost:3000/tiposUvas';
@@ -81,6 +120,7 @@ const CreateOrEditGrapeType = () => {
         method: method,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
         },
         body: JSON.stringify(payload),
       });
