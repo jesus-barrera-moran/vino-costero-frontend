@@ -28,6 +28,9 @@ function App() {
         {/* Ruta para crear un nuevo usuario */}
         <Route path="/create-user" element={<UserForm />} />
 
+        {/* Ruta para editar un usuario existente */}
+        <Route path="/edit-user/:username" element={<UserForm />} />
+
         {/* Ruta para mostrar el listado de parcelas con acordeones */}
         <Route path="/parcels" element={<ParcelsListWithDetails />} />
 

@@ -20,6 +20,7 @@ const Login = () => {
         // Guardar el token JWT en localStorage
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('roles', response.data.roles);
+        localStorage.setItem('username', response.data.username);
 
         // Mensaje de éxito y redirección
         message.success('Inicio de sesión exitoso');
