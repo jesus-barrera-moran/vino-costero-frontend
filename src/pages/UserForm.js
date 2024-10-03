@@ -71,6 +71,13 @@ const CreateOrEditUser = () => {
             rol: usuario.roles.map((role) => role.id_rol), // Cargar el rol actual desde la tabla usuario_roles
           });
         } catch (error) {
+          if (error.response.status === 401) {
+            // Si la respuesta es 401, redirigir al login
+            message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+            localStorage.removeItem('token'); // Remover el token inválido
+            navigate('/login'); // Redirigir al login
+            return;
+          }
           message.error('Error al obtener datos del usuario');
         } finally {
           setLoading(false); // Desactivar el estado de carga después de obtener los datos

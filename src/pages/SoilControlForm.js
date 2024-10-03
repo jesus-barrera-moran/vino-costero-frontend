@@ -148,7 +148,7 @@ const RegisterSoilControl = () => {
 
       {/* Contenido principal */}
       <Content style={{ padding: '24px' }}>
-        <Card title="Registrar Control de Tierra" bordered={false} style={{ marginTop: 20 }}>
+        <Card title="Registrar Control de Tierra" bordered={false} style={{ marginTop: 20, maxWidth: '800px', margin: '0 auto' }}>
           <Form
             form={form}
             layout="vertical"
@@ -165,6 +165,7 @@ const RegisterSoilControl = () => {
                 <Select
                   placeholder="Seleccione una parcela"
                   onChange={handleParcelaChange}
+                  style={{ width: '100%' }}
                 >
                   {parcelas.map((parcela) => (
                     <Select.Option key={parcela.id} value={parcela.id}>

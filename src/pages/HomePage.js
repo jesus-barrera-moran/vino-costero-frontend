@@ -1,5 +1,5 @@
-import React from 'react';
-import { Layout, Button, Row, Col, Typography, Card } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Button, Row, Col, Typography, Card, message, Spin } from 'antd';
 import {
   DatabaseOutlined,
   BarChartOutlined,
@@ -16,6 +16,26 @@ const { Title, Paragraph } = Typography;
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Verificar si el usuario tiene el token, sino redirigir a login
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Debe estar autenticado para acceder a esta página');
+      navigate('/login'); // Redirige al login si no hay token
+    } else {
+      setIsAuthenticated(true);
+    }
+  }, [navigate]);
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando tipos de uva..." />
+      </div>
+    );
+  }
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
