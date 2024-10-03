@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Form, Input, InputNumber, Button, Card, Select, message, Collapse, Descriptions, Spin } from 'antd';
+import { Layout, Form, Input, InputNumber, Button, Card, Select, message, Collapse, Descriptions, Spin, Row, Col, Typography } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Option } = Select;
 const { Panel } = Collapse;
+const { Title } = Typography;
 
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
@@ -55,6 +56,7 @@ const CreateOrEditGrapeType = () => {
             'Content-Type': 'application/json',
           },
         });
+
         if (parcelasResponse.status === 401) {
           // Si la respuesta es 401, redirigir al login
           message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
@@ -62,17 +64,10 @@ const CreateOrEditGrapeType = () => {
           navigate('/login'); // Redirigir al login
           return;
         }
+
         const parcelasData = await parcelasResponse.json();
-
-        // Filtrar solo las parcelas que tengan siembra activa sin un tipo de uva asignado
-        const parcelasFiltradas = !id && parcelasData.filter((parcela) => {
-          return (
-            parcela.siembra_activa && // Tiene siembra activa
-            !parcela.siembra_activa.tipo_uva // No tiene tipo de uva asignado
-          );
-        });
-
-        setParcelas(id ? parcelasData : parcelasFiltradas);
+        const filteredParcelas = parcelasData.filter((parcela) => parcela.siembra_activa && !parcela.siembra_activa.tipo_uva);
+        setParcelas(filteredParcelas);
 
         if (id) {
           // Si hay un ID en la URL, estamos en modo de edición
@@ -82,6 +77,7 @@ const CreateOrEditGrapeType = () => {
               'Content-Type': 'application/json',
             },
           });
+
           if (tipoUvaResponse.status === 401) {
             // Si la respuesta es 401, redirigir al login
             message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
@@ -89,6 +85,7 @@ const CreateOrEditGrapeType = () => {
             navigate('/login'); // Redirigir al login
             return;
           }
+
           const tipoUvaData = await tipoUvaResponse.json();
           setIsEditMode(true);
           form.setFieldsValue({
@@ -102,14 +99,16 @@ const CreateOrEditGrapeType = () => {
           });
           setSelectedParcels(tipoUvaData.parcelas);
         }
+
         setLoading(false);
       } catch (error) {
         message.error('Error al cargar los datos.');
         setLoading(false);
       }
     };
+
     fetchData();
-  }, [id, form]);  
+  }, [id, form]);
 
   const onFinish = async (values) => {
     try {
@@ -220,7 +219,7 @@ const CreateOrEditGrapeType = () => {
       <NavBarMenu defaultSelectedKeys={['2']} />
 
       {/* Contenido principal */}
-      <Content style={{ padding: '24px' }}>
+      <Content style={{ padding: '24px', width: '1000px', margin: 'auto' }}>
         <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20 }}>
           <Form form={form} layout="vertical" name="create-edit-grape-type" onFinish={onFinish}>
             {/* Selección de Parcelas */}
@@ -253,24 +252,34 @@ const CreateOrEditGrapeType = () => {
               <Input placeholder="Nombre de la uva" />
             </Form.Item>
 
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="Humedad (%)" name="humedad" rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}>
+                  <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Temperatura (°C)" name="temperatura" rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}>
+                  <InputNumber min={0} placeholder="Temperatura" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="PH del Suelo" name="ph" rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}>
+                  <InputNumber min={0} max={14} placeholder="PH del suelo" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}>
+                  <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
+
             <Form.Item label="Descripción" name="descripcion" rules={[{ required: true, message: 'Por favor, ingrese una descripción' }]}>
               <Input.TextArea placeholder="Descripción de la uva" />
-            </Form.Item>
-
-            <Form.Item label="PH del Suelo" name="ph" rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}>
-              <InputNumber min={0} max={14} placeholder="PH del suelo" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item label="Humedad (%)" name="humedad" rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}>
-              <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item label="Temperatura (°C)" name="temperatura" rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}>
-              <InputNumber min={0} placeholder="Temperatura" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}>
-              <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
             </Form.Item>
 
             <Form.Item>

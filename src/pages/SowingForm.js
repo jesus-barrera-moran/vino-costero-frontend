@@ -271,7 +271,7 @@ const CreateOrEditSowing = () => {
             <Form.Item
               label="Tipo de Uva"
               name="id_tipo_uva"
-              rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
+              // rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
             >
               <Select placeholder="Seleccione el tipo de uva" disabled={isEditMode} onChange={handleUvaChange}>
                 {tiposDeUva.map((uva, index) => (
