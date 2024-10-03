@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Form, Input, Button, InputNumber, message, Card, Collapse, Select, Spin } from 'antd';
+import { Layout, Form, Input, Button, InputNumber, message, Card, Collapse, Select, Spin, Typography, Row, Col } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
 const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
 const { Option } = Select;
+const { Title, Text } = Typography;
 
 // Estados disponibles para la parcela
 const estadosParcelas = ['Disponible', 'Ocupada'];
@@ -106,6 +107,13 @@ const ParcelForm = () => {
           control_tierra: values.control_tierra,
         }),
       });
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
 
       if (response.ok) {
         const messageText = isEditing ? 'La parcela ha sido actualizada exitosamente' : 'La parcela ha sido registrada exitosamente';
@@ -134,8 +142,8 @@ const ParcelForm = () => {
       <NavBarMenu defaultSelectedKeys={['2']} />
 
       {/* Contenido Principal */}
-      <Content style={{ padding: '24px' }}>
-        <Card title={isEditing ? `Editar Parcela` : `Registrar Nueva Parcela`} bordered={false} style={{ maxWidth: 800, margin: '0 auto', marginTop: 50 }}>
+      <Content style={{ paddingBottom: '24px' }}>
+        <Card title={isEditing ? `Editar Parcela` : `Registrar Nueva Parcela`} bordered={false} style={{ maxWidth: 900, margin: '0 auto', marginTop: 50 }}>
           {loadingData ? (
             <Spin tip="Cargando datos..." />
           ) : (
@@ -145,31 +153,56 @@ const ParcelForm = () => {
               name="parcel-form"
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
+              style={{ marginBottom: '30px' }}
             >
-              {/* Datos generales de la parcela */}
-              <Form.Item
-                label="Nombre de la parcela"
-                name="nombre"
-                rules={[{ required: true, message: 'Por favor, ingrese el nombre de la parcela' }]}
-              >
-                <Input placeholder="Nombre de la parcela" disabled={isEditing && !canEdit} />
-              </Form.Item>
+              <Title level={4}>Datos Generales</Title>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Nombre de la parcela"
+                    name="nombre"
+                    rules={[{ required: true, message: 'Por favor, ingrese el nombre de la parcela' }]}
+                  >
+                    <Input placeholder="Nombre de la parcela" disabled={isEditing && !canEdit} />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Estado de la Parcela"
+                    name="estado_parcela"
+                    rules={[{ required: true, message: 'Por favor, seleccione el estado de la parcela' }]}
+                  >
+                    <Select placeholder="Seleccione el estado de la parcela" disabled={isEditing && !canEdit}>
+                      {estadosParcelas.map((estado) => (
+                        <Option key={estado} value={estado}>
+                          {estado}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
 
-              <Form.Item
-                label="Longitud (coordenadas)"
-                name="longitud"
-                rules={[{ required: true, message: 'Por favor, ingrese la longitud (coordenadas) de la parcela' }]}
-              >
-                <Input placeholder="Longitud" disabled={isEditing && !canEdit} />
-              </Form.Item>
-
-              <Form.Item
-                label="Latitud (coordenadas)"
-                name="latitud"
-                rules={[{ required: true, message: 'Por favor, ingrese la latitud (coordenadas) de la parcela' }]}
-              >
-                <Input placeholder="Latitud" disabled={isEditing && !canEdit} />
-              </Form.Item>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Longitud (coordenadas)"
+                    name="longitud"
+                    rules={[{ required: true, message: 'Por favor, ingrese la longitud (coordenadas) de la parcela' }]}
+                  >
+                    <Input placeholder="Longitud" disabled={isEditing && !canEdit} />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Latitud (coordenadas)"
+                    name="latitud"
+                    rules={[{ required: true, message: 'Por favor, ingrese la latitud (coordenadas) de la parcela' }]}
+                  >
+                    <Input placeholder="Latitud" disabled={isEditing && !canEdit} />
+                  </Form.Item>
+                </Col>
+              </Row>
 
               <Form.Item
                 label="Ubicación"
@@ -179,75 +212,73 @@ const ParcelForm = () => {
                 <Input placeholder="Descripción de la ubicación" disabled={isEditing && !canEdit} />
               </Form.Item>
 
-              {/* Dropdown para cambiar el estado de la parcela */}
-              <Form.Item
-                label="Estado de la Parcela"
-                name="estado_parcela"
-                rules={[{ required: true, message: 'Por favor, seleccione el estado de la parcela' }]}
-              >
-                <Select placeholder="Seleccione el estado de la parcela" disabled={isEditing && !canEdit}>
-                  {estadosParcelas.map((estado) => (
-                    <Option key={estado} value={estado}>
-                      {estado}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
               <Collapse defaultActiveKey={['1']} accordion>
-                {/* Sección de Dimensiones */}
                 <Panel header="Dimensiones de la Parcela" key="1">
-                  <Form.Item
-                    label="Superficie (hectáreas)"
-                    name={['dimensiones', 'superficie']}
-                    rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
-                  >
-                    <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Superficie" style={{ width: '100%' }} />
-                  </Form.Item>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        label="Superficie (hectáreas)"
+                        name={['dimensiones', 'superficie']}
+                        rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
+                      >
+                        <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Superficie" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        label="Longitud (metros)"
+                        name={['dimensiones', 'longitud']}
+                        rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela en metros' }]}
+                      >
+                        <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Longitud" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
-                  <Form.Item
-                    label="Longitud (metros)"
-                    name={['dimensiones', 'longitud']}
-                    rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela en metros' }]}
-                  >
-                    <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Longitud" style={{ width: '100%' }} />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="Anchura (metros)"
-                    name={['dimensiones', 'anchura']}
-                    rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela en metros' }]}
-                  >
-                    <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Anchura" style={{ width: '100%' }} />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="Pendiente (%)"
-                    name={['dimensiones', 'pendiente']}
-                    rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela en porcentaje' }]}
-                  >
-                    <InputNumber disabled={!isDimensionEditable} min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
-                  </Form.Item>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Form.Item
+                        label="Anchura (metros)"
+                        name={['dimensiones', 'anchura']}
+                        rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela en metros' }]}
+                      >
+                        <InputNumber disabled={!isDimensionEditable} min={0} placeholder="Anchura" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item
+                        label="Pendiente (%)"
+                        name={['dimensiones', 'pendiente']}
+                        rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela en porcentaje' }]}
+                      >
+                        <InputNumber disabled={!isDimensionEditable} min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                  </Row>
                 </Panel>
 
-                {/* Sección de Control de Tierra */}
                 {!isEditing && canCreate && (
                   <Panel header="Control de Tierra" key="2">
-                    <Form.Item
-                      label="PH de la tierra"
-                      name={['control_tierra', 'ph']}
-                      rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
-                    >
-                      <InputNumber min={0} max={14} step={0.1} placeholder="PH de la tierra" style={{ width: '100%' }} />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Humedad del suelo (%)"
-                      name={['control_tierra', 'humedad']}
-                      rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad del suelo' }]}
-                    >
-                      <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
-                    </Form.Item>
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item
+                          label="PH de la tierra"
+                          name={['control_tierra', 'ph']}
+                          rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
+                        >
+                          <InputNumber min={0} max={14} step={0.1} placeholder="PH de la tierra" style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item
+                          label="Humedad del suelo (%)"
+                          name={['control_tierra', 'humedad']}
+                          rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad del suelo' }]}
+                        >
+                          <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
                     <Form.Item
                       label="Temperatura del suelo (°C)"
@@ -265,7 +296,7 @@ const ParcelForm = () => {
               </Collapse>
 
               <Form.Item style={{ marginTop: 20 }}>
-                <Button type="primary" htmlType="submit" loading={loading} disabled={!canCreate && !canEdit} style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}>
+                <Button type="primary" htmlType="submit" loading={loading} disabled={!canCreate && !canEdit} style={{ backgroundColor: '#8B0000', borderColor: '#8B0000', width: '100%' }}>
                   {isEditing ? 'Actualizar Parcela' : 'Registrar Parcela'}
                 </Button>
               </Form.Item>

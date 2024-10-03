@@ -56,6 +56,13 @@ const CreateOrEditSowing = () => {
             'Content-Type': 'application/json',
           },
         });
+        if (response.status === 401) {
+          // Si la respuesta es 401, redirigir al login
+          message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+          localStorage.removeItem('token'); // Remover el token inválido
+          navigate('/login'); // Redirigir al login
+          return;
+        }
         const data = await response.json();
         const parcelasDisponibles = !window.location.pathname.includes('edit-sowing') ? data.filter(parcela => !parcela.siembra_activa) : data;
         setParcelas(parcelasDisponibles);
@@ -81,6 +88,13 @@ const CreateOrEditSowing = () => {
             'Content-Type': 'application/json',
           },
         });
+        if (response.status === 401) {
+          // Si la respuesta es 401, redirigir al login
+          message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+          localStorage.removeItem('token'); // Remover el token inválido
+          navigate('/login'); // Redirigir al login
+          return;
+        }
         const data = await response.json();
         setTiposDeUva(data);
   
@@ -103,6 +117,13 @@ const CreateOrEditSowing = () => {
             'Content-Type': 'application/json',
           },
         });
+        if (response.status === 401) {
+          // Si la respuesta es 401, redirigir al login
+          message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+          localStorage.removeItem('token'); // Remover el token inválido
+          navigate('/login'); // Redirigir al login
+          return;
+        }
         const siembraData = await response.json();
         setSiembra(siembraData);
   
@@ -163,6 +184,13 @@ const CreateOrEditSowing = () => {
           observaciones_siembra: values.observaciones_siembra || 'Sin observaciones',
         }),
       });
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
 
       if (response.ok) {
         const successMessage = isEditMode ? 'Siembra actualizada exitosamente' : 'Siembra registrada exitosamente';

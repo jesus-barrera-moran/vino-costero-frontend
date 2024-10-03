@@ -55,6 +55,13 @@ const CreateOrEditGrapeType = () => {
             'Content-Type': 'application/json',
           },
         });
+        if (parcelasResponse.status === 401) {
+          // Si la respuesta es 401, redirigir al login
+          message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+          localStorage.removeItem('token'); // Remover el token inválido
+          navigate('/login'); // Redirigir al login
+          return;
+        }
         const parcelasData = await parcelasResponse.json();
 
         // Filtrar solo las parcelas que tengan siembra activa sin un tipo de uva asignado
@@ -75,6 +82,13 @@ const CreateOrEditGrapeType = () => {
               'Content-Type': 'application/json',
             },
           });
+          if (tipoUvaResponse.status === 401) {
+            // Si la respuesta es 401, redirigir al login
+            message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+            localStorage.removeItem('token'); // Remover el token inválido
+            navigate('/login'); // Redirigir al login
+            return;
+          }
           const tipoUvaData = await tipoUvaResponse.json();
           setIsEditMode(true);
           form.setFieldsValue({
@@ -126,6 +140,14 @@ const CreateOrEditGrapeType = () => {
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Error en el servidor');

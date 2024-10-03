@@ -50,6 +50,13 @@ const ParcelSowingOverview = () => {
           'Content-Type': 'application/json',
         },
       }); // Ajustar la URL según el backend
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
       if (!response.ok) {
         throw new Error('Error al obtener las parcelas con siembras');
       }

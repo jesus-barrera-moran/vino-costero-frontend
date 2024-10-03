@@ -60,6 +60,13 @@ const ParcelDimensionsOverview = () => {
           'Content-Type': 'application/json',
         },
       }); // Ajusta la URL si es necesario
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
       if (!response.ok) {
         throw new Error('Error al obtener las dimensiones');
       }

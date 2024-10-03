@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message, Spin } from 'antd';
+import { Layout, Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message, Spin, Row, Col } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
@@ -58,6 +58,13 @@ const EditParcelDimensions = () => {
           'Content-Type': 'application/json',
         },
       });
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
       if (!response.ok) {
         throw new Error('Error al obtener los detalles de la parcela');
       }
@@ -122,6 +129,14 @@ const EditParcelDimensions = () => {
         }),
       });
 
+      if (response.status === 401) {
+        // Si la respuesta es 401, redirigir al login
+        message.error('Sesión expirada. Por favor, inicie sesión de nuevo.');
+        localStorage.removeItem('token'); // Remover el token inválido
+        navigate('/login'); // Redirigir al login
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Error al actualizar las dimensiones');
       }
@@ -150,7 +165,7 @@ const EditParcelDimensions = () => {
 
       {/* Contenido principal */}
       <Content style={{ padding: '24px' }}>
-        <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, padding: '20px 40px' }}>
+        <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, maxWidth: '800px', margin: '0 auto' }}>
           {/* Formulario para editar dimensiones */}
           <Form
             form={form}
@@ -193,37 +208,47 @@ const EditParcelDimensions = () => {
               </Panel>
             </Collapse>
 
-            <Form.Item
-              label="Superficie (hectáreas)"
-              name="superficie"
-              rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
-            >
-              <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="Superficie (hectáreas)"
+                  name="superficie"
+                  rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
+                >
+                  <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="Longitud (metros)"
+                  name="longitud"
+                  rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
+                >
+                  <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Form.Item
-              label="Longitud (metros)"
-              name="longitud"
-              rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
-            >
-              <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              label="Anchura (metros)"
-              name="anchura"
-              rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
-            >
-              <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              label="Pendiente (%)"
-              name="pendiente"
-              rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
-            >
-              <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="Anchura (metros)"
+                  name="anchura"
+                  rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
+                >
+                  <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="Pendiente (%)"
+                  name="pendiente"
+                  rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
+                >
+                  <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
 
             {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
 
