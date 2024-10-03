@@ -13,12 +13,12 @@ import {
   CheckSquareOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import './ParcelControl.css'; // Estilos específicos para esta página
+import './ParcelPanel.css'; // Estilos específicos para esta página
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph } = Typography;
 
-const ParcelControl = () => {
+const ParcelPanel = () => {
   const navigate = useNavigate();
 
   return (
@@ -145,4 +145,4 @@ const ParcelControl = () => {
   );
 };
 
-export default ParcelControl;
+export default ParcelPanel;

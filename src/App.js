@@ -15,7 +15,11 @@ import GrapeTypeForm from './pages/GrapeTypeForm';
 import SowingsListWithDetails from './pages/SowingsListWithDetails';
 import SowingForm from './pages/SowingForm';
 import MainPage from './pages/HomePage';
-import ParcelsPanelControl from './pages/ParcelControl';
+import ParcelsPanel from './pages/ParcelPanel';
+import BusinessPanel from './pages/BusinessPanel';
+import LogisticPanel from './pages/LogisticPanel';
+import ProductionPanel from './pages/ProductionPanel';
+import QualityPanel from './pages/QualityPanel';
 
 function App() {
   return (
@@ -25,7 +29,19 @@ function App() {
         <Route path="/" element={<MainPage />} />
 
         {/* Ruta para el panel de control de parcelas */}
-        <Route path="/parcels-panel" element={<ParcelsPanelControl />} />
+        <Route path="/parcels-panel" element={<ParcelsPanel />} />
+
+        {/* Ruta para el panel de control de negocios */}
+        <Route path="/business-panel" element={<BusinessPanel />} />
+
+        {/* Ruta para el panel de control de logística */}
+        <Route path="/logistic-panel" element={<LogisticPanel />} />
+
+        {/* Ruta para el panel de control de producción */}
+        <Route path="/production-panel" element={<ProductionPanel />} />
+
+        {/* Ruta para el panel de control de calidad */}
+        <Route path="/quality-panel" element={<QualityPanel />} />
 
         {/* Ruta para el inicio de sesión */}
         <Route path="/login" element={<Login />} />
