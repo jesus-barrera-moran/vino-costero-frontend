@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Button, Row, Col, Typography, Card } from 'antd';
+import { Layout, Button, Row, Col, Typography, Card } from 'antd';
 import {
   DatabaseOutlined,
   BarChartOutlined,
@@ -8,9 +8,10 @@ import {
   FileDoneOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import NavBarMenu from './NavBarMenu';
 import './MainPage.css'; // Puedes usar este archivo para manejar los estilos de la imagen del banner
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Title, Paragraph } = Typography;
 
 const MainPage = () => {
@@ -19,15 +20,7 @@ const MainPage = () => {
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
       {/* Barra de navegación superior */}
-      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
-        <Menu theme="dark" mode="horizontal" style={{ backgroundColor: '#004d40' }}>
-          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
-          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
-          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
-          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
-          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
-        </Menu>
-      </Header>
+      <NavBarMenu defaultSelectedKeys={['2']} />
 
       {/* Banner/Encabezado con imagen */}
       <div className="banner-container">

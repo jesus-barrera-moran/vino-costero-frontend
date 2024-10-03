@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Table, Card, Collapse, Descriptions, Button, Spin, message, Alert } from 'antd';
-import { PlusOutlined, DatabaseOutlined, BarChartOutlined, AppstoreAddOutlined, UserOutlined, FileDoneOutlined } from '@ant-design/icons';
+import { Layout, Table, Card, Collapse, Descriptions, Button, Spin, message, Alert } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import NavBarMenu from './NavBarMenu';
 
 const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
@@ -195,15 +196,7 @@ const GrapeTypeOverview = () => {
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
       {/* Barra de navegación superior */}
-      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
-          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
-          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
-          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
-          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
-          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
-        </Menu>
-      </Header>
+      <NavBarMenu defaultSelectedKeys={['2']} />
 
       {/* Contenido Principal */}
       <Content style={{ padding: '24px' }}>
