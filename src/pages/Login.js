@@ -24,7 +24,7 @@ const Login = () => {
 
         // Mensaje de éxito y redirección
         message.success('Inicio de sesión exitoso');
-        navigate('/parcels'); // Redirigir al dashboard o la pantalla principal
+        navigate('/'); // Redirigir al dashboard o la pantalla principal
       } else {
         message.error('Nombre de usuario o contraseña incorrectos');
       }
