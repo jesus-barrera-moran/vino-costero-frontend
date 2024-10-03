@@ -1,0 +1,19 @@
+/* ParcelControl.css */
+
+.parcel-banner {
+    background-image: url('https://via.placeholder.com/1920x400'); /* Puedes reemplazar esta URL con una imagen adecuada */
+    background-size: cover;
+    background-position: center;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .parcel-banner-content {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro para mejorar la legibilidad */
+    padding: 30px;
+    border-radius: 10px;
+  }
+  

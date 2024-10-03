@@ -7,17 +7,20 @@ import {
   UserOutlined,
   FileDoneOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import './MainPage.css'; // Puedes usar este archivo para manejar los estilos de la imagen del banner
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph } = Typography;
 
 const MainPage = () => {
+  const navigate = useNavigate();
+
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
       {/* Barra de navegación superior */}
       <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']} style={{ backgroundColor: '#004d40' }}>
+        <Menu theme="dark" mode="horizontal" style={{ backgroundColor: '#004d40' }}>
           <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
           <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
           <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
@@ -69,7 +72,13 @@ const MainPage = () => {
               <AppstoreAddOutlined style={{ fontSize: '36px', color: '#8B0000' }} />
               <Title level={4} style={{ color: '#8B0000' }}>Control de Parcelas</Title>
               <Paragraph>Registra y monitorea las parcelas y tipos de uvas.</Paragraph>
-              <Button type="primary" style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}>Ver Detalles</Button>
+              <Button
+                type="primary"
+                style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
+                onClick={() => navigate('/parcels-panel')}
+              >
+                Ver Detalles
+              </Button>
             </Card>
           </Col>
 
