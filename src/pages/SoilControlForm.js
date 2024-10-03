@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse, Spin } from 'antd';
+import { Layout, Menu, Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse, Spin } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
+import { DatabaseOutlined, BarChartOutlined, AppstoreAddOutlined, UserOutlined, FileDoneOutlined } from '@ant-design/icons';
 
+const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
 
 // Función para verificar permisos
@@ -125,93 +127,114 @@ const RegisterSoilControl = () => {
   }
 
   return (
-    <Card title="Registrar Control de Tierra" bordered={false} style={{ marginTop: 20 }}>
-      <Form
-        form={form}
-        layout="vertical"
-        name="register-soil-control"
-        onFinish={onFinish}
-      >
-        {/* Seleccionar parcela solo si no venimos desde una parcela específica */}
-        {!id && (
-          <Form.Item
-            label="Seleccionar Parcela"
-            name="parcela"
-            rules={[{ required: true, message: 'Por favor, seleccione una parcela' }]}
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
+      {/* Barra de navegación superior */}
+      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
+        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
+          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
+          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
+          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
+          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
+          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
+        </Menu>
+      </Header>
+
+      {/* Contenido principal */}
+      <Content style={{ padding: '24px' }}>
+        <Card title="Registrar Control de Tierra" bordered={false} style={{ marginTop: 20 }}>
+          <Form
+            form={form}
+            layout="vertical"
+            name="register-soil-control"
+            onFinish={onFinish}
           >
-            <Select
-              placeholder="Seleccione una parcela"
-              onChange={handleParcelaChange}
+            {/* Seleccionar parcela solo si no venimos desde una parcela específica */}
+            {!id && (
+              <Form.Item
+                label="Seleccionar Parcela"
+                name="parcela"
+                rules={[{ required: true, message: 'Por favor, seleccione una parcela' }]}
+              >
+                <Select
+                  placeholder="Seleccione una parcela"
+                  onChange={handleParcelaChange}
+                >
+                  {parcelas.map((parcela) => (
+                    <Select.Option key={parcela.id} value={parcela.id}>
+                      {parcela.nombre}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            )}
+
+            {/* Acordeones para mostrar información de la parcela y el último control de tierra */}
+            {selectedParcela && (
+              <Collapse accordion style={{ marginBottom: 20 }}>
+                <Panel header="Información de la Parcela" key="1">
+                  <Descriptions bordered column={1}>
+                    <Descriptions.Item label="Nombre">{selectedParcela.nombre}</Descriptions.Item>
+                    <Descriptions.Item label="Longitud (coordenadas)">{selectedParcela.longitud}</Descriptions.Item>
+                    <Descriptions.Item label="Latitud (coordenadas)">{selectedParcela.latitud}</Descriptions.Item>
+                    <Descriptions.Item label="Ubicación">{selectedParcela.ubicacion}</Descriptions.Item>
+                    <Descriptions.Item label="Estado de la Parcela">{selectedParcela.estado}</Descriptions.Item>
+                  </Descriptions>
+                </Panel>
+
+                <Panel header="Último Control de Tierra" key="2">
+                  <Descriptions bordered column={1}>
+                    <Descriptions.Item label="PH">{selectedParcela.control_tierra?.ph || 'N/A'}</Descriptions.Item>
+                    <Descriptions.Item label="Humedad">{selectedParcela.control_tierra?.humedad || 'N/A'}%</Descriptions.Item>
+                    <Descriptions.Item label="Temperatura">{selectedParcela.control_tierra?.temperatura || 'N/A'}°C</Descriptions.Item>
+                    <Descriptions.Item label="Observaciones">{selectedParcela.control_tierra?.observaciones || 'N/A'}</Descriptions.Item>
+                  </Descriptions>
+                </Panel>
+              </Collapse>
+            )}
+
+            {/* Campos del formulario para ingresar los datos del nuevo control de tierra */}
+            <Form.Item
+              label="PH de la Tierra"
+              name="ph"
+              rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
             >
-              {parcelas.map((parcela) => (
-                <Select.Option key={parcela.id} value={parcela.id}>
-                  {parcela.nombre}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
+              <InputNumber min={0} max={14} step={0.1} placeholder="PH" style={{ width: '100%' }} />
+            </Form.Item>
 
-        {/* Acordeones para mostrar información de la parcela y el último control de tierra */}
-        {selectedParcela && (
-          <Collapse accordion style={{ marginBottom: 20 }}>
-            <Panel header="Información de la Parcela" key="1">
-              <Descriptions bordered column={1}>
-                <Descriptions.Item label="Nombre">{selectedParcela.nombre}</Descriptions.Item>
-                <Descriptions.Item label="Longitud (coordenadas)">{selectedParcela.longitud}</Descriptions.Item>
-                <Descriptions.Item label="Latitud (coordenadas)">{selectedParcela.latitud}</Descriptions.Item>
-                <Descriptions.Item label="Ubicación">{selectedParcela.ubicacion}</Descriptions.Item>
-                <Descriptions.Item label="Estado de la Parcela">{selectedParcela.estado}</Descriptions.Item>
-              </Descriptions>
-            </Panel>
+            <Form.Item
+              label="Humedad (%)"
+              name="humedad"
+              rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}
+            >
+              <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+            </Form.Item>
 
-            <Panel header="Último Control de Tierra" key="2">
-              <Descriptions bordered column={1}>
-                <Descriptions.Item label="PH">{selectedParcela.control_tierra?.ph || 'N/A'}</Descriptions.Item>
-                <Descriptions.Item label="Humedad">{selectedParcela.control_tierra?.humedad || 'N/A'}%</Descriptions.Item>
-                <Descriptions.Item label="Temperatura">{selectedParcela.control_tierra?.temperatura || 'N/A'}°C</Descriptions.Item>
-                <Descriptions.Item label="Observaciones">{selectedParcela.control_tierra?.observaciones || 'N/A'}</Descriptions.Item>
-              </Descriptions>
-            </Panel>
-          </Collapse>
-        )}
+            <Form.Item
+              label="Temperatura (°C)"
+              name="temperatura"
+              rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}
+            >
+              <InputNumber min={-50} max={50} placeholder="Temperatura" style={{ width: '100%' }} />
+            </Form.Item>
 
-        {/* Campos del formulario para ingresar los datos del nuevo control de tierra */}
-        <Form.Item
-          label="PH de la Tierra"
-          name="ph"
-          rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
-        >
-          <InputNumber min={0} max={14} step={0.1} placeholder="PH" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item label="Observaciones" name="observaciones">
+              <Input.TextArea placeholder="Ingrese observaciones" rows={4} />
+            </Form.Item>
 
-        <Form.Item
-          label="Humedad (%)"
-          name="humedad"
-          rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}
-        >
-          <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" style={{ width: '100%', backgroundColor: '#8B0000', borderColor: '#8B0000' }}>
+                Registrar Control de Tierra
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Content>
 
-        <Form.Item
-          label="Temperatura (°C)"
-          name="temperatura"
-          rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}
-        >
-          <InputNumber min={-50} max={50} placeholder="Temperatura" style={{ width: '100%' }} />
-        </Form.Item>
-
-        <Form.Item label="Observaciones" name="observaciones">
-          <Input.TextArea placeholder="Ingrese observaciones" rows={4} />
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
-            Registrar Control de Tierra
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+      {/* Footer */}
+      <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
+        Vino Costero ©2024 - Sistema de Control de Producción y Logística
+      </Footer>
+    </Layout>
   );
 };
 

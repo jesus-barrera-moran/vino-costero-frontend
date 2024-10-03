@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, InputNumber, Button, Card, Select, message, Collapse, Descriptions } from 'antd';
+import { Layout, Menu, Form, Input, InputNumber, Button, Card, Select, message, Collapse, Descriptions, Spin } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
+import { DatabaseOutlined, BarChartOutlined, AppstoreAddOutlined, UserOutlined, FileDoneOutlined } from '@ant-design/icons';
 
+const { Header, Content, Footer } = Layout;
 const { Option } = Select;
 const { Panel } = Collapse;
 
@@ -183,69 +185,94 @@ const CreateOrEditGrapeType = () => {
   };
 
   if (loading) {
-    return <p>Cargando datos...</p>;
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando tipos de uva..." />
+      </div>
+    );
   }
 
   return (
-    <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20 }}>
-      <Form form={form} layout="vertical" name="create-edit-grape-type" onFinish={onFinish}>
-        {/* Selección de Parcelas */}
-        {parcelas && parcelas.length > 0 && (
-          <Form.Item label="Seleccionar Parcelas" name="parcelas">
-            <Select
-              mode="multiple"
-              placeholder="Seleccione las parcelas"
-              defaultValue={selectedParcels}
-              onChange={setSelectedParcels}
-              disabled={isEditMode}
-            >
-              {parcelas.map((parcela) => (
-                <Option key={parcela.id} value={parcela.id}>
-                  {parcela.nombre}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        )}
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
+      {/* Barra de navegación superior */}
+      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
+        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
+          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
+          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
+          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
+          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
+          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
+        </Menu>
+      </Header>
 
-        {/* Acordeones para las parcelas seleccionadas */}
-        {selectedParcels.length > 0 && (
-          <div style={{ marginBottom: '20px' }}>
-            {selectedParcels.map((parcelaId) => renderParcelDetails(parcelaId))}
-          </div>
-        )}
+      {/* Contenido principal */}
+      <Content style={{ padding: '24px' }}>
+        <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20 }}>
+          <Form form={form} layout="vertical" name="create-edit-grape-type" onFinish={onFinish}>
+            {/* Selección de Parcelas */}
+            {parcelas && parcelas.length > 0 && (
+              <Form.Item label="Seleccionar Parcelas" name="parcelas">
+                <Select
+                  mode="multiple"
+                  placeholder="Seleccione las parcelas"
+                  defaultValue={selectedParcels}
+                  onChange={setSelectedParcels}
+                  disabled={isEditMode}
+                >
+                  {parcelas.map((parcela) => (
+                    <Option key={parcela.id} value={parcela.id}>
+                      {parcela.nombre}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            )}
 
-        <Form.Item label="Nombre de la Uva" name="nombre" rules={[{ required: true, message: 'Por favor, ingrese el nombre de la uva' }]}>
-          <Input placeholder="Nombre de la uva" />
-        </Form.Item>
+            {/* Acordeones para las parcelas seleccionadas */}
+            {selectedParcels.length > 0 && (
+              <div style={{ marginBottom: '20px' }}>
+                {selectedParcels.map((parcelaId) => renderParcelDetails(parcelaId))}
+              </div>
+            )}
 
-        <Form.Item label="Descripción" name="descripcion" rules={[{ required: true, message: 'Por favor, ingrese una descripción' }]}>
-          <Input.TextArea placeholder="Descripción de la uva" />
-        </Form.Item>
+            <Form.Item label="Nombre de la Uva" name="nombre" rules={[{ required: true, message: 'Por favor, ingrese el nombre de la uva' }]}>
+              <Input placeholder="Nombre de la uva" />
+            </Form.Item>
 
-        <Form.Item label="PH del Suelo" name="ph" rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}>
-          <InputNumber min={0} max={14} placeholder="PH del suelo" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item label="Descripción" name="descripcion" rules={[{ required: true, message: 'Por favor, ingrese una descripción' }]}>
+              <Input.TextArea placeholder="Descripción de la uva" />
+            </Form.Item>
 
-        <Form.Item label="Humedad (%)" name="humedad" rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}>
-          <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item label="PH del Suelo" name="ph" rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}>
+              <InputNumber min={0} max={14} placeholder="PH del suelo" style={{ width: '100%' }} />
+            </Form.Item>
 
-        <Form.Item label="Temperatura (°C)" name="temperatura" rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}>
-          <InputNumber min={0} placeholder="Temperatura" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item label="Humedad (%)" name="humedad" rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}>
+              <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+            </Form.Item>
 
-        <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}>
-          <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item label="Temperatura (°C)" name="temperatura" rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}>
+              <InputNumber min={0} placeholder="Temperatura" style={{ width: '100%' }} />
+            </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            {isEditMode ? 'Guardar Cambios' : 'Registrar Uva'}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+            <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}>
+              <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" style={{ width: '100%', backgroundColor: '#8B0000', borderColor: '#8B0000' }}>
+                {isEditMode ? 'Guardar Cambios' : 'Registrar Uva'}
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Content>
+
+      {/* Footer */}
+      <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
+        Vino Costero ©2024 - Sistema de Control de Producción y Logística
+      </Footer>
+    </Layout>
   );
 };
 

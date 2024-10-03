@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message, Spin } from 'antd';
+import { Layout, Menu, Form, InputNumber, Button, Card, Descriptions, Collapse, Alert, message, Spin } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
+import { DatabaseOutlined, BarChartOutlined, AppstoreAddOutlined, UserOutlined, FileDoneOutlined } from '@ant-design/icons';
 
+const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
 
 // Función para calcular el área ocupada
@@ -142,90 +144,111 @@ const EditParcelDimensions = () => {
   const esParcelaDisponible = parcela.estado.toLowerCase() === 'disponible';
 
   return (
-    <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, padding: '20px 40px' }}>
-      {/* Formulario para editar dimensiones */}
-      <Form
-        form={form}
-        layout="vertical"
-        name="edit-dimensions"
-        onFinish={onFinish}
-        onValuesChange={handleDimensionChange}
-        style={{ marginBottom: 30 }}
-        disabled={!canEdit || !esParcelaDisponible} // Deshabilitar si no tiene permisos o la parcela no está disponible
-      >
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
+      {/* Barra de navegación superior */}
+      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
+        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
+          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
+          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
+          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
+          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
+          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
+        </Menu>
+      </Header>
 
-        {!esParcelaDisponible && (
-          <Alert
-            message="No es posible editar las dimensiones de una parcela que no está disponible."
-            type="error"
-            showIcon
+      {/* Contenido principal */}
+      <Content style={{ padding: '24px' }}>
+        <Card title={`Editar Dimensiones de ${parcela.nombre}`} bordered={false} style={{ marginTop: 20, padding: '20px 40px' }}>
+          {/* Formulario para editar dimensiones */}
+          <Form
+            form={form}
+            layout="vertical"
+            name="edit-dimensions"
+            onFinish={onFinish}
+            onValuesChange={handleDimensionChange}
             style={{ marginBottom: 30 }}
-          />
-        )}
+            disabled={!canEdit || !esParcelaDisponible} // Deshabilitar si no tiene permisos o la parcela no está disponible
+          >
 
-        {/* Acordeones para información adicional de la parcela */}
-        <Collapse accordion style={{ marginBottom: '10px' }}>
-          <Panel header="Información General de la Parcela" key="1">
-            <Descriptions column={1} bordered>
-              <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
-              <Descriptions.Item label="Longitud (coordenadas)">{parcela.longitud}</Descriptions.Item>
-              <Descriptions.Item label="Latitud (coordenadas)">{parcela.latitud}</Descriptions.Item>
-              <Descriptions.Item label="Ubicación">{parcela.ubicacion}</Descriptions.Item>
-              <Descriptions.Item label="Estado de la Parcela">{parcela.estado}</Descriptions.Item>
-            </Descriptions>
-          </Panel>
+            {!esParcelaDisponible && (
+              <Alert
+                message="No es posible editar las dimensiones de una parcela que no está disponible."
+                type="error"
+                showIcon
+                style={{ marginBottom: 30 }}
+              />
+            )}
 
-          <Panel header="Dimensiones Actuales" key="2">
-            <Descriptions column={1} bordered>
-              <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
-              <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
-              <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
-              <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
-            </Descriptions>
-          </Panel>
-        </Collapse>
+            {/* Acordeones para información adicional de la parcela */}
+            <Collapse accordion style={{ marginBottom: '10px' }}>
+              <Panel header="Información General de la Parcela" key="1">
+                <Descriptions column={1} bordered>
+                  <Descriptions.Item label="Nombre">{parcela.nombre}</Descriptions.Item>
+                  <Descriptions.Item label="Longitud (coordenadas)">{parcela.longitud}</Descriptions.Item>
+                  <Descriptions.Item label="Latitud (coordenadas)">{parcela.latitud}</Descriptions.Item>
+                  <Descriptions.Item label="Ubicación">{parcela.ubicacion}</Descriptions.Item>
+                  <Descriptions.Item label="Estado de la Parcela">{parcela.estado}</Descriptions.Item>
+                </Descriptions>
+              </Panel>
 
-        <Form.Item
-          label="Superficie (hectáreas)"
-          name="superficie"
-          rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
-        >
-          <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
-        </Form.Item>
+              <Panel header="Dimensiones Actuales" key="2">
+                <Descriptions column={1} bordered>
+                  <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
+                  <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
+                  <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
+                  <Descriptions.Item label="Pendiente">{parcela.dimensiones.pendiente}%</Descriptions.Item>
+                </Descriptions>
+              </Panel>
+            </Collapse>
 
-        <Form.Item
-          label="Longitud (metros)"
-          name="longitud"
-          rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
-        >
-          <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item
+              label="Superficie (hectáreas)"
+              name="superficie"
+              rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
+            >
+              <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
+            </Form.Item>
 
-        <Form.Item
-          label="Anchura (metros)"
-          name="anchura"
-          rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
-        >
-          <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item
+              label="Longitud (metros)"
+              name="longitud"
+              rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
+            >
+              <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
+            </Form.Item>
 
-        <Form.Item
-          label="Pendiente (%)"
-          name="pendiente"
-          rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
-        >
-          <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
-        </Form.Item>
+            <Form.Item
+              label="Anchura (metros)"
+              name="anchura"
+              rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
+            >
+              <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
+            </Form.Item>
 
-        {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
+            <Form.Item
+              label="Pendiente (%)"
+              name="pendiente"
+              rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
+            >
+              <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
+            </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px' }} disabled={!canEdit || !esParcelaDisponible}>
-            Guardar Cambios
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+            {warning && <Alert message={warning} type="warning" showIcon style={{ marginBottom: 20 }} />}
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#8B0000', borderColor: '#8B0000' }} disabled={!canEdit || !esParcelaDisponible}>
+                Guardar Cambios
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+      </Content>
+
+      {/* Footer */}
+      <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
+        Vino Costero ©2024 - Sistema de Control de Producción y Logística
+      </Footer>
+    </Layout>
   );
 };
 
