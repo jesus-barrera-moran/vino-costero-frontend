@@ -14,11 +14,15 @@ import GrapeTypesListWithDetails from './pages/GrapeTypesListWithDetails';
 import GrapeTypeForm from './pages/GrapeTypeForm';
 import SowingsListWithDetails from './pages/SowingsListWithDetails';
 import SowingForm from './pages/SowingForm';
+import MainPage from './pages/HomePage';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Ruta para la página principal */}
+        <Route path="/" element={<MainPage />} />
+
         {/* Ruta para el inicio de sesión */}
         <Route path="/login" element={<Login />} />
 

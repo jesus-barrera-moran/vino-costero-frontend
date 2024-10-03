@@ -1,0 +1,31 @@
+/* MainPage.css */
+
+.banner-container {
+    /* background-image: url('https://via.placeholder.com/1920x600'); */
+    background-image: url('../images/banner.webp'); /* Aquí puedes colocar la URL de tu imagen de fondo */
+    background-size: cover;
+    background-position: bottom;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .banner-content {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Oscurece un poco la imagen para resaltar el texto */
+    padding: 40px;
+    border-radius: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .banner-container {
+      height: 250px;
+    }
+  
+    .banner-content {
+      padding: 20px;
+    }
+  }
+  
