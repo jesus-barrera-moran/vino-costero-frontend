@@ -27,7 +27,7 @@ const ParcelControl = () => {
       <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
         <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
           <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
-          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
+          <Menu.Item onClick={() => navigate('/parcels-panel')} key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
           <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
           <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
           <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>

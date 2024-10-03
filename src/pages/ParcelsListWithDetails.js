@@ -236,6 +236,14 @@ const ParcelsListWithDetails = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando tipos de uva..." />
+      </div>
+    );
+  }
+
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
       {/* Barra de navegación superior */}

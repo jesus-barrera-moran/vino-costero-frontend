@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Card, Collapse, Descriptions, Timeline, Button, message, Spin } from 'antd';
+import { Layout, Menu, Table, Card, Collapse, Descriptions, Timeline, Button, message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { EditOutlined } from '@ant-design/icons'; // Íconos
+import { EditOutlined, DatabaseOutlined, BarChartOutlined, AppstoreAddOutlined, UserOutlined, FileDoneOutlined } from '@ant-design/icons'; // Íconos
 
+const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
 
 // Función para verificar permisos
@@ -158,21 +159,42 @@ const ParcelSowingOverview = () => {
   }
 
   return (
-    <Card title="Visualización de Parcelas y Siembras" bordered={false} style={{ marginTop: 20 }}>
-      {canCreateOrEdit && (
-        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-sowing')}>
-          Registrar Nueva Siembra
-        </Button>
-      )}
-      <Table
-        columns={columns}
-        dataSource={parcelas}
-        rowKey="id"
-        expandable={{
-          expandedRowRender: (record) => expandedRowRender(record),
-        }}
-      />
-    </Card>
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
+      {/* Barra de navegación superior */}
+      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
+        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
+          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
+          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
+          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
+          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
+          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
+        </Menu>
+      </Header>
+
+      {/* Contenido Principal */}
+      <Content style={{ padding: '24px' }}>
+        <Card title="Visualización de Parcelas y Siembras" bordered={false} style={{ marginTop: 20 }}>
+          {canCreateOrEdit && (
+            <Button type="primary" style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }} onClick={() => navigate('/create-sowing')}>
+              Registrar Nueva Siembra
+            </Button>
+          )}
+          <Table
+            columns={columns}
+            dataSource={parcelas}
+            rowKey="id"
+            expandable={{
+              expandedRowRender: (record) => expandedRowRender(record),
+            }}
+          />
+        </Card>
+      </Content>
+
+      {/* Footer */}
+      <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
+        Vino Costero ©2024 - Sistema de Control de Producción y Logística
+      </Footer>
+    </Layout>
   );
 };
 

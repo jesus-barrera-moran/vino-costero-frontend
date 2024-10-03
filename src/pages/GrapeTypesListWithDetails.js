@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Card, Collapse, Descriptions, Button, Spin, message, Alert } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Layout, Menu, Table, Card, Collapse, Descriptions, Button, Spin, message, Alert } from 'antd';
+import { PlusOutlined, DatabaseOutlined, BarChartOutlined, AppstoreAddOutlined, UserOutlined, FileDoneOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
+const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
 
 // Función para verificar permisos
@@ -87,7 +88,11 @@ const GrapeTypeOverview = () => {
       key: 'acciones',
       render: (record) => (
         canEdit && (
-          <Button type="primary" onClick={() => navigate(`/edit-grape-type/${record.id}`)}>
+          <Button 
+            type="primary" 
+            onClick={() => navigate(`/edit-grape-type/${record.id}`)} 
+            style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
+          >
             Modificar
           </Button>
         )
@@ -164,7 +169,7 @@ const GrapeTypeOverview = () => {
                 {canCreate && (
                   <Button
                     type="primary"
-                    style={{ marginTop: 10 }}
+                    style={{ marginTop: 10, backgroundColor: '#8B0000', borderColor: '#8B0000' }}
                     icon={<PlusOutlined />}
                     onClick={() => handleCreateSiembra()}
                   >
@@ -188,21 +193,42 @@ const GrapeTypeOverview = () => {
   }
 
   return (
-    <Card title="Gestión de Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
-      {canCreate && (
-        <Button type="primary" style={{ marginBottom: 16 }} onClick={() => navigate('/create-grape-type')}>
-          Registrar Nuevo Tipo de Uva
-        </Button>
-      )}
-      <Table
-        columns={columns}
-        dataSource={tiposUva}
-        rowKey="id"
-        expandable={{
-          expandedRowRender: (record) => expandedRowRender(record),
-        }}
-      />
-    </Card>
+    <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
+      {/* Barra de navegación superior */}
+      <Header style={{ backgroundColor: '#004d40', padding: 0 }}>
+        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} style={{ backgroundColor: '#004d40' }}>
+          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
+          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
+          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
+          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
+          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
+        </Menu>
+      </Header>
+
+      {/* Contenido Principal */}
+      <Content style={{ padding: '24px' }}>
+        <Card title="Gestión de Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
+          {canCreate && (
+            <Button type="primary" style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }} onClick={() => navigate('/create-grape-type')}>
+              Registrar Nuevo Tipo de Uva
+            </Button>
+          )}
+          <Table
+            columns={columns}
+            dataSource={tiposUva}
+            rowKey="id"
+            expandable={{
+              expandedRowRender: (record) => expandedRowRender(record),
+            }}
+          />
+        </Card>
+      </Content>
+
+      {/* Footer */}
+      <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
+        Vino Costero ©2024 - Sistema de Control de Producción y Logística
+      </Footer>
+    </Layout>
   );
 };
 
