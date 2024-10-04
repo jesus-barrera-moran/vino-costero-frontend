@@ -29,7 +29,7 @@ const Login = () => {
         message.error('Nombre de usuario o contraseña incorrectos');
       }
     } catch (error) {
-      message.error('Error en el inicio de sesión. Verifique sus credenciales.');
+      message.error(`Error en el inicio de sesión. ${error.response?.data?.error || 'Verifique sus credenciales'}.`);
     } finally {
       setLoading(false);
     }

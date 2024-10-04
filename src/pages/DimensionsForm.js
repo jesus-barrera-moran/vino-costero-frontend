@@ -148,7 +148,11 @@ const EditParcelDimensions = () => {
   };
 
   if (loading) {
-    return <Spin tip="Cargando datos de la parcela..." />;
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando tipos de uva..." />
+      </div>
+    );
   }
 
   if (!parcela) {
