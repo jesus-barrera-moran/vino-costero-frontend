@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Row, Col, Card, Typography, Button } from 'antd';
+import { Layout, Row, Col, Card, Typography, Button, Tooltip } from 'antd';
 import {
   DatabaseOutlined,
   EnvironmentOutlined,
@@ -7,6 +7,7 @@ import {
   FieldTimeOutlined,
   BarsOutlined,
   CheckSquareOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import NavBarMenu from './NavBarMenu';
 import { useNavigate } from 'react-router-dom';
@@ -110,7 +111,7 @@ const ParcelPanel = () => {
 
           {/* Control de Siembras */}
           <Col xs={24} sm={12} lg={8}>
-            <Card hoverable style={{ borderRadius: '10px', textAlign: 'center' }}>
+            <Card hoverable style={{ borderRadius: '10px', textAlign: 'center', position: 'relative' }}>
               <CheckSquareOutlined style={{ fontSize: '36px', color: '#8B0000' }} />
               <Title level={4} style={{ color: '#8B0000' }}>Control de Siembras</Title>
               <Paragraph>Monitorea y registra el control de siembras en cada parcela.</Paragraph>
@@ -121,6 +122,20 @@ const ParcelPanel = () => {
               >
                 Ir a Control de Siembras
               </Button>
+              <Tooltip title="Funcionalidad no disponible. Pronto estará habilitada." placement="topRight">
+                <Button
+                  shape="circle"
+                  icon={<ExclamationCircleOutlined />}
+                  style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'yellow',
+                  }}
+                />
+              </Tooltip>
             </Card>
           </Col>
         </Row>

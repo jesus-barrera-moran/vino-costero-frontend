@@ -104,11 +104,11 @@ const NavBarMenu = ({ defaultSelectedKeys }) => {
           style={{ backgroundColor: '#004d40', flexGrow: 1, justifyContent: 'center', borderBottom: 'none' }}
           onClick={handleMenuClick} // Evento para manejar clicks
         >
-          <Menu.Item key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
+          <Menu.Item disabled key="1" icon={<DatabaseOutlined />}>Producción de vinos</Menu.Item>
           <Menu.Item key="2" icon={<AppstoreAddOutlined />}>Control de parcelas</Menu.Item>
-          <Menu.Item key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
-          <Menu.Item key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
-          <Menu.Item key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
+          <Menu.Item disabled key="3" icon={<FileDoneOutlined />}>Control de calidad</Menu.Item>
+          <Menu.Item disabled key="4" icon={<BarChartOutlined />}>Logística</Menu.Item>
+          <Menu.Item disabled key="5" icon={<UserOutlined />}>Análisis de negocios</Menu.Item>
         </Menu>
 
         {/* Menú de Usuario */}
