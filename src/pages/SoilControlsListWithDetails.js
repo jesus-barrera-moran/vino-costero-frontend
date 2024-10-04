@@ -161,7 +161,7 @@ const ParcelSoilControlOverview = () => {
 
       {/* Contenido Principal */}
       <Content style={{ padding: '24px' }}>
-        <Card title="Visualización de Parcelas y Controles de Tierra" bordered={false} style={{ marginTop: 20 }}>
+        <Card title="Controles de Tierra de Parcelas" bordered={false} style={{ marginTop: 20 }}>
           {canCreate && (
             <Button
               type="primary"

@@ -244,7 +244,7 @@ const ParcelsListWithDetails = () => {
 
       {/* Contenido Principal */}
       <Content style={{ padding: '24px' }}>
-        <Card title="Listado de Parcelas" bordered={false} style={{ marginTop: 20 }}>
+        <Card title="Parcelas" bordered={false} style={{ marginTop: 20 }}>
           {canCreate && (
             <Button type="primary" style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }} onClick={() => navigate('/create-parcel')}>
               Registrar Nueva Parcela

@@ -219,7 +219,7 @@ const GrapeTypeOverview = () => {
       <NavBarMenu defaultSelectedKeys={['2']} />
 
       <Content style={{ padding: '24px' }}>
-        <Card title="Gestión de Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
+        <Card title="Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
           {canCreate && (
             <Button
               type="primary"

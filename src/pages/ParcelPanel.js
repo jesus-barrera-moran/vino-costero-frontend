@@ -16,8 +16,20 @@ import './ParcelPanel.css'; // Estilos específicos para esta página
 const { Content, Footer } = Layout;
 const { Title, Paragraph } = Typography;
 
+// Función para verificar permisos
+const checkPermission = (allowedRoles) => {
+  const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
+  return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
 const ParcelPanel = () => {
   const navigate = useNavigate();
+
+  const canViewSoilControl = checkPermission([1, 3, 5]);
+  const canViewSowings = checkPermission([1, 2, 3, 4, 5]);
+  const canViewDimensions = checkPermission([1, 3, 5]);
+  const canViewGrapes = checkPermission([1, 2, 5]);
+  const canViewParcel = checkPermission([1, 3, 5]);
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
@@ -39,9 +51,26 @@ const ParcelPanel = () => {
                 type="primary"
                 style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
                 onClick={() => navigate('/soil-controls')}
+                disabled={!canViewSoilControl}
               >
                 Ir a Control de Tierra
               </Button>
+              {!canViewSoilControl && (
+                <Tooltip title="No tienes permisos para utilizar esta funcionalidad." placement="topRight">
+                  <Button
+                    shape="circle"
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'orange',
+                    }}
+                  />
+                </Tooltip>
+              )}
             </Card>
           </Col>
 
@@ -55,9 +84,26 @@ const ParcelPanel = () => {
                 type="primary"
                 style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
                 onClick={() => navigate('/parcels')}
+                disabled={!canViewParcel}
               >
                 Ir a Registro de Parcelas
               </Button>
+              {!canViewParcel && (
+                <Tooltip title="No tienes permisos para utilizar esta funcionalidad." placement="topRight">
+                  <Button
+                    shape="circle"
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'orange',
+                    }}
+                  />
+                </Tooltip>
+              )}
             </Card>
           </Col>
 
@@ -71,9 +117,26 @@ const ParcelPanel = () => {
                 type="primary"
                 style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
                 onClick={() => navigate('/dimensions')}
+                disabled={!canViewDimensions}
               >
                 Ir a Dimensiones
               </Button>
+              {!canViewDimensions && (
+                <Tooltip title="No tienes permisos para utilizar esta funcionalidad." placement="topRight">
+                  <Button
+                    shape="circle"
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'orange',
+                    }}
+                  />
+                </Tooltip>
+              )}
             </Card>
           </Col>
 
@@ -87,9 +150,26 @@ const ParcelPanel = () => {
                 type="primary"
                 style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
                 onClick={() => navigate('/sowings')}
+                disabled={!canViewSowings}
               >
                 Ir a Datos de Siembra
               </Button>
+              {!canViewSowings && (
+                <Tooltip title="No tienes permisos para utilizar esta funcionalidad." placement="topRight">
+                  <Button
+                    shape="circle"
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'orange',
+                    }}
+                  />
+                </Tooltip>
+              )}
             </Card>
           </Col>
 
@@ -103,9 +183,26 @@ const ParcelPanel = () => {
                 type="primary"
                 style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
                 onClick={() => navigate('/grape-types')}
+                disabled={!canViewGrapes}
               >
                 Ir a Tipos de Uvas
               </Button>
+              {!canViewGrapes && (
+                <Tooltip title="No tienes permisos para utilizar esta funcionalidad." placement="topRight">
+                  <Button
+                    shape="circle"
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 10,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'orange',
+                    }}
+                  />
+                </Tooltip>
+              )}
             </Card>
           </Col>
 

@@ -166,7 +166,7 @@ const ParcelSowingOverview = () => {
 
       {/* Contenido Principal */}
       <Content style={{ padding: '24px' }}>
-        <Card title="Visualización de Parcelas y Siembras" bordered={false} style={{ marginTop: 20 }}>
+        <Card title="Siembras de Parcelas" bordered={false} style={{ marginTop: 20 }}>
           {canCreateOrEdit && (
             <Button type="primary" style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }} onClick={() => navigate('/create-sowing')}>
               Registrar Nueva Siembra
