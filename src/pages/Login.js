@@ -1,11 +1,21 @@
-import React from 'react';
-import { Form, Input, Button, Card, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, Card, message, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const { Title, Text } = Typography;
+
 const Login = () => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Si ya existe un token, redirigir a la pantalla de inicio
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/'); // Redirigir al dashboard o la pantalla principal
+    }
+  }, [navigate]);
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -19,10 +29,9 @@ const Login = () => {
       if (response.data.token) {
         // Guardar el token JWT en localStorage
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('roles', response.data.roles);
+        localStorage.setItem('roles', JSON.stringify(response.data.roles));
         localStorage.setItem('username', response.data.username);
 
-        // Mensaje de éxito y redirección
         message.success('Inicio de sesión exitoso');
         navigate('/'); // Redirigir al dashboard o la pantalla principal
       } else {
@@ -37,7 +46,22 @@ const Login = () => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f2f5' }}>
-      <Card title="Iniciar Sesión" bordered={false} style={{ width: 400 }}>
+      <Card
+        bordered={false}
+        style={{
+          width: 400,
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          borderRadius: '8px',
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <Title level={3} style={{ color: '#8B0000', fontWeight: 'bold' }}>
+            Iniciar Sesión
+          </Title>
+          <Text type="secondary">
+            Bienvenido al Sistema de Control de Producción y Logística de Vino Costero
+          </Text>
+        </div>
         <Form
           name="login"
           onFinish={onFinish}
@@ -63,7 +87,7 @@ const Login = () => {
 
           {/* Botón de Inicio de Sesión */}
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={loading} block>
+            <Button type="primary" htmlType="submit" loading={loading} block style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}>
               Iniciar Sesión
             </Button>
           </Form.Item>
