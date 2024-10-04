@@ -78,6 +78,14 @@ const ParcelForm = () => {
     }
   }, [isEditing, id, form]);
 
+  if (loadingData) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando Parcela..." />
+      </div>
+    );
+  }
+
   // Función para manejar el submit del formulario
   const onFinish = async (values) => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
@@ -141,7 +149,7 @@ const ParcelForm = () => {
       <NavBarMenu defaultSelectedKeys={['2']} />
 
       {/* Contenido Principal */}
-      <Content style={{ paddingBottom: '24px' }}>
+      <Content style={{ padding: '24px' }}>
         <Card title={isEditing ? `Editar Parcela` : `Registrar Nueva Parcela`} bordered={false} style={{ marginTop: 20, maxWidth: '800px', margin: '0 auto' }}>
           {loadingData ? (
             <Spin tip="Cargando datos..." />

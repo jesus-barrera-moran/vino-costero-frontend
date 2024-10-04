@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Table, Card, Collapse, Descriptions, Timeline, Button, message, Spin } from 'antd';
+import { Layout, Table, Card, Collapse, Descriptions, Timeline, Spin, message } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 
 // Función para calcular el área ocupada (longitud * anchura en metros cuadrados)
@@ -95,34 +96,36 @@ const ParcelDimensionsOverview = () => {
       title: 'Superficie (ha)',
       dataIndex: ['dimensionesActuales', 'superficie'],
       key: 'superficie',
+      align: 'center',
     },
     {
       title: 'Longitud (m)',
       dataIndex: ['dimensionesActuales', 'longitud'],
       key: 'longitud',
+      align: 'center',
     },
     {
       title: 'Anchura (m)',
       dataIndex: ['dimensionesActuales', 'anchura'],
       key: 'anchura',
+      align: 'center',
     },
     {
       title: 'Pendiente (%)',
       dataIndex: ['dimensionesActuales', 'pendiente'],
       key: 'pendiente',
+      align: 'center',
     },
     {
       title: 'Acciones',
       key: 'acciones',
+      align: 'center',
       render: (record) => (
         canEdit && (
-          <Button
-            type="primary"
+          <EditOutlined
+            style={{ color: '#8B0000', fontSize: '18px' }}
             onClick={() => navigate(`/edit-dimensions/${record.id}`)}
-            style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
-          >
-            Editar
-          </Button>
+          />
         )
       ),
     },
@@ -135,10 +138,13 @@ const ParcelDimensionsOverview = () => {
     const porcentajeOcupado = calcularPorcentajeOcupado(areaOcupada, superficie);
 
     return (
-      <Collapse accordion>
-        {/* Detalles de Dimensiones Actuales */}
-        <Panel header="Detalles de Dimensiones Actuales" key="1">
-          <Descriptions column={2} bordered>
+      <Collapse accordion bordered={false} style={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
+        <Panel
+          header="Detalles de Dimensiones Actuales"
+          key="1"
+          style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}
+        >
+          <Descriptions size="small" column={2} bordered>
             <Descriptions.Item label="Superficie Total">{superficie} hectáreas</Descriptions.Item>
             <Descriptions.Item label="Área Ocupada">{areaOcupada.toFixed(2)} hectáreas</Descriptions.Item>
             <Descriptions.Item label="Porcentaje Ocupado">{porcentajeOcupado}%</Descriptions.Item>
@@ -150,13 +156,17 @@ const ParcelDimensionsOverview = () => {
         </Panel>
 
         {/* Historial de Dimensiones */}
-        <Panel header="Historial de Dimensiones" key="2">
+        <Panel header="Historial de Dimensiones" key="2" style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}>
           <Timeline>
             {parcela.historialDimensiones.map((dimension, index) => (
               <Timeline.Item key={index}>
-                <Collapse>
-                  <Panel header={`Dimensiones al ${dimension.fecha}`} key={index + 1}>
-                    <Descriptions column={2} bordered>
+                <Collapse bordered={false} style={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
+                  <Panel
+                    header={`Dimensiones al ${dimension.fecha}`}
+                    key={index + 1}
+                    style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}
+                  >
+                    <Descriptions size="small" column={2} bordered>
                       <Descriptions.Item label="Superficie">{dimension.superficie} ha</Descriptions.Item>
                       <Descriptions.Item label="Longitud">{dimension.longitud} m</Descriptions.Item>
                       <Descriptions.Item label="Anchura">{dimension.anchura} m</Descriptions.Item>
@@ -166,9 +176,7 @@ const ParcelDimensionsOverview = () => {
                 </Collapse>
               </Timeline.Item>
             ))}
-            {parcela.historialDimensiones.length === 0 && (
-              <p>No hay historial disponible para esta parcela.</p>
-            )}
+            {parcela.historialDimensiones.length === 0 && <p>No hay historial disponible para esta parcela.</p>}
           </Timeline>
         </Panel>
       </Collapse>
@@ -200,6 +208,7 @@ const ParcelDimensionsOverview = () => {
               columns={columns}
               dataSource={parcelas}
               rowKey="id"
+              bordered
               expandable={{
                 expandedRowRender: (record) => expandedRowRender(record),
               }}

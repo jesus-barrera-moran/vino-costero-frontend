@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Table, Card, Collapse, Descriptions, Button, Spin, message, Alert } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 
 // Función para verificar permisos
@@ -90,19 +90,18 @@ const GrapeTypeOverview = () => {
       title: 'Tiempo de Cosecha (días)',
       dataIndex: 'tiempoCosecha',
       key: 'tiempoCosecha',
+      align: 'center',
     },
     {
       title: 'Acciones',
       key: 'acciones',
+      align: 'center',
       render: (record) => (
         canEdit && (
-          <Button 
-            type="primary" 
-            onClick={() => navigate(`/edit-grape-type/${record.id}`)} 
-            style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
-          >
-            Modificar
-          </Button>
+          <EditOutlined
+            style={{ color: '#8B0000', fontSize: '18px' }}
+            onClick={() => navigate(`/edit-grape-type/${record.id}`)}
+          />
         )
       ),
     },
@@ -115,10 +114,13 @@ const GrapeTypeOverview = () => {
   // Función para mostrar los detalles del tipo de uva y las parcelas relacionadas
   const expandedRowRender = (uva) => {
     return (
-      <Collapse accordion>
-        {/* Acordeón para los detalles del tipo de uva */}
-        <Panel header="Detalles del Tipo de Uva" key="1">
-          <Descriptions column={1} bordered>
+      <Collapse accordion bordered={false} style={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
+        <Panel
+          header={<span>Detalles del Tipo de Uva</span>}
+          key="1"
+          style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}
+        >
+          <Descriptions size='small' column={1} bordered>
             <Descriptions.Item label="Nombre">{uva.nombre}</Descriptions.Item>
             <Descriptions.Item label="Descripción">{uva.descripcion}</Descriptions.Item>
             <Descriptions.Item label="PH Requerido del Suelo">{uva.ph_requerido}</Descriptions.Item>
@@ -128,25 +130,38 @@ const GrapeTypeOverview = () => {
           </Descriptions>
         </Panel>
 
-        {/* Acordeón para las parcelas donde está plantada la uva */}
-        <Panel header="Parcelas donde está plantada" key="2">
-          <Collapse accordion>
+        <Panel
+          header={<span>Parcelas donde está plantada</span>}
+          key="2"
+          style={{ backgroundColor: '#ffffff', borderRadius: '5px' }}
+        >
+          <Collapse accordion bordered={false}>
             {uva.parcelas && uva.parcelas.length > 0 ? (
               uva.parcelas.map((parcela, index) => (
-                <Panel header={`Parcela: ${parcela.nombre}`} key={index + 1}>
-                  {/* Acordeón para la Siembra Activa */}
-                  <Collapse accordion>
-                    <Panel header="Siembra Activa" key={`siembra-${index}`}>
-                      <Descriptions column={1} bordered>
+                <Panel
+                  header={<span>Parcela: {parcela.nombre}</span>}
+                  key={`parcela-${index}`}
+                  style={{ backgroundColor: '#f5f5f5', borderRadius: '5px', marginBottom: '5px' }}
+                >
+                  <Collapse accordion bordered={false}>
+                    <Panel
+                      header={<span>Siembra Activa</span>}
+                      key={`siembra-${index}`}
+                      style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}
+                    >
+                      <Descriptions size='small' column={1} bordered>
                         <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActual.cantidad_plantas}</Descriptions.Item>
                         <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActual.tecnica_siembra}</Descriptions.Item>
                         <Descriptions.Item label="Observaciones">{parcela.siembraActual.observaciones}</Descriptions.Item>
                       </Descriptions>
                     </Panel>
 
-                    {/* Acordeón para las Dimensiones */}
-                    <Panel header="Dimensiones" key={`dimensiones-${index}`}>
-                      <Descriptions column={2} bordered>
+                    <Panel
+                      header={<span>Dimensiones</span>}
+                      key={`dimensiones-${index}`}
+                      style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}
+                    >
+                      <Descriptions size='small' column={1} bordered>
                         <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
                         <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
                         <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
@@ -154,9 +169,12 @@ const GrapeTypeOverview = () => {
                       </Descriptions>
                     </Panel>
 
-                    {/* Acordeón para el Último Control de Tierra */}
-                    <Panel header="Último Control de Tierra" key={`controlTierra-${index}`}>
-                      <Descriptions column={2} bordered>
+                    <Panel
+                      header={<span>Último Control de Tierra</span>}
+                      key={`controlTierra-${index}`}
+                      style={{ backgroundColor: '#ffffff', borderRadius: '5px' }}
+                    >
+                      <Descriptions size='small' column={1} bordered>
                         <Descriptions.Item label="PH del Suelo">{parcela.controlTierra.ph}</Descriptions.Item>
                         <Descriptions.Item label="Humedad">{parcela.controlTierra.humedad}%</Descriptions.Item>
                         <Descriptions.Item label="Temperatura">{parcela.controlTierra.temperatura}°C</Descriptions.Item>
@@ -175,14 +193,10 @@ const GrapeTypeOverview = () => {
                   showIcon
                 />
                 {canCreate && (
-                  <Button
-                    type="primary"
-                    style={{ marginTop: 10, backgroundColor: '#8B0000', borderColor: '#8B0000' }}
-                    icon={<PlusOutlined />}
+                  <PlusOutlined
+                    style={{ color: '#8B0000', fontSize: '18px', marginTop: '10px' }}
                     onClick={() => handleCreateSiembra()}
-                  >
-                    Crear nueva siembra
-                  </Button>
+                  />
                 )}
               </div>
             )}
@@ -202,14 +216,16 @@ const GrapeTypeOverview = () => {
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#F5F5F5' }}>
-      {/* Barra de navegación superior */}
       <NavBarMenu defaultSelectedKeys={['2']} />
 
-      {/* Contenido Principal */}
       <Content style={{ padding: '24px' }}>
         <Card title="Gestión de Tipos de Uva" bordered={false} style={{ marginTop: 20 }}>
           {canCreate && (
-            <Button type="primary" style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }} onClick={() => navigate('/create-grape-type')}>
+            <Button
+              type="primary"
+              style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }}
+              onClick={() => navigate('/create-grape-type')}
+            >
               Registrar Nuevo Tipo de Uva
             </Button>
           )}
@@ -217,14 +233,12 @@ const GrapeTypeOverview = () => {
             columns={columns}
             dataSource={tiposUva}
             rowKey="id"
-            expandable={{
-              expandedRowRender: (record) => expandedRowRender(record),
-            }}
+            expandable={{ expandedRowRender }}
+            bordered
           />
         </Card>
       </Content>
 
-      {/* Footer */}
       <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
         Vino Costero ©2024 - Sistema de Control de Producción y Logística
       </Footer>

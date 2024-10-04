@@ -88,6 +88,7 @@ const ParcelsListWithDetails = () => {
       title: 'Estado',
       dataIndex: 'estado',
       key: 'estado',
+      align: 'center',
     },
     {
       title: 'Ubicación',
@@ -98,21 +99,25 @@ const ParcelsListWithDetails = () => {
       title: 'Longitud',
       dataIndex: 'longitud',
       key: 'longitud',
+      align: 'center',
     },
     {
       title: 'Latitud',
       dataIndex: 'latitud',
       key: 'latitud',
+      align: 'center',
     },
     {
       title: 'Acciones',
       key: 'acciones',
+      align: 'center',
       render: (text, record) => (
         <Space size="middle">
           {canEdit && (
-            <Button type="primary" onClick={() => handleEdit(record.id)} style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}>
-              Editar
-            </Button>
+            <EditOutlined
+              style={{ color: '#8B0000', fontSize: '18px' }}
+              onClick={() => handleEdit(record.id)}
+            />
           )}
         </Space>
       ),
@@ -142,26 +147,20 @@ const ParcelsListWithDetails = () => {
     navigate(`/create-sowing/${id}`);
   };
 
-  // Función para mostrar los detalles de cada parcela
   const expandedRowRender = (parcela) => {
     return (
-      <Collapse accordion>
-        {/* Acordeón para Dimensiones */}
+      <Collapse accordion bordered={false} style={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
         <Panel
-          header="Dimensiones"
+          header={<Space>Dimensiones</Space>}
           key="1"
-          extra={canEdit && (
-            <Button
-              type="default"
-              icon={<EditOutlined />}
-              style={{ color: '#1890ff' }}
-              onClick={() => handleEditDimensions(parcela.id)}
-            >
-              Editar
-            </Button>
-          )}
+          style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}
+          extra={
+            canEdit && (
+              <EditOutlined style={{ color: '#1890ff' }} onClick={() => handleEditDimensions(parcela.id)} />
+            )
+          }
         >
-          <Descriptions column={1} bordered>
+          <Descriptions size='small' column={1} bordered>
             <Descriptions.Item label="Superficie">{parcela.dimensiones.superficie} hectáreas</Descriptions.Item>
             <Descriptions.Item label="Longitud">{parcela.dimensiones.longitud} metros</Descriptions.Item>
             <Descriptions.Item label="Anchura">{parcela.dimensiones.anchura} metros</Descriptions.Item>
@@ -169,23 +168,18 @@ const ParcelsListWithDetails = () => {
           </Descriptions>
         </Panel>
 
-        {/* Siembra Activa */}
         {parcela.siembra_activa ? (
           <Panel
-            header="Siembra Activa"
+            header={<Space>Siembra Activa</Space>}
             key="2"
-            extra={canEdit && (
-              <Button
-                type="default"
-                icon={<EditOutlined />}
-                style={{ color: '#52c41a' }}
-                onClick={() => handleEditSiembra(parcela.id)}
-              >
-                Editar
-              </Button>
-            )}
+            style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}
+            extra={
+              canEdit && (
+                <EditOutlined style={{ color: '#52c41a' }} onClick={() => handleEditSiembra(parcela.id)} />
+              )
+            }
           >
-            <Descriptions column={1} bordered>
+            <Descriptions size='small' column={1} bordered>
               <Descriptions.Item label="Tipo de Uva">{parcela.siembra_activa.tipo_uva}</Descriptions.Item>
               <Descriptions.Item label="Cantidad de Plantas">{parcela.siembra_activa.cantidad_plantas}</Descriptions.Item>
               <Descriptions.Item label="Técnica Utilizada">{parcela.siembra_activa.tecnica}</Descriptions.Item>
@@ -195,9 +189,9 @@ const ParcelsListWithDetails = () => {
           </Panel>
         ) : (
           <Panel
-            header={<span><ExclamationCircleOutlined /> Sin Siembra Activa</span>}
+            header={<Space><ExclamationCircleOutlined /> Sin Siembra Activa</Space>}
             key="2"
-            style={{ backgroundColor: '#fffbe6' }}
+            style={{ backgroundColor: '#fffbe6', borderRadius: '5px', marginBottom: '5px' }}
           >
             <Alert
               message="No hay siembra activa en esta parcela."
@@ -206,34 +200,25 @@ const ParcelsListWithDetails = () => {
               showIcon
             />
             {canCreate && (
-              <Button
-                type="primary"
-                style={{ marginTop: 10, backgroundColor: '#8B0000', borderColor: '#8B0000' }}
-                icon={<PlusOutlined />}
+              <PlusOutlined
+                style={{ color: '#8B0000', fontSize: '18px', marginTop: '10px' }}
                 onClick={() => handleCreateSiembra(parcela.id)}
-              >
-                Crear nueva siembra
-              </Button>
+              />
             )}
           </Panel>
         )}
 
-        {/* Acordeón para Control de Tierra */}
         <Panel
-          header="Control de Tierra"
+          header={<Space>Control de Tierra</Space>}
           key="3"
-          extra={canCreate && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              style={{ backgroundColor: '#faad14', borderColor: '#faad14' }}
-              onClick={() => handleCreateControlTierra(parcela.id)}
-            >
-              Crear
-            </Button>
-          )}
+          style={{ backgroundColor: '#ffffff', borderRadius: '5px' }}
+          extra={
+            canCreate && (
+              <PlusOutlined style={{ color: '#faad14' }} onClick={() => handleCreateControlTierra(parcela.id)} />
+            )
+          }
         >
-          <Descriptions column={1} bordered>
+          <Descriptions size='small' column={1} bordered>
             <Descriptions.Item label="PH de la Tierra">{parcela.control_tierra?.ph}</Descriptions.Item>
             <Descriptions.Item label="Humedad">{parcela.control_tierra?.humedad}%</Descriptions.Item>
             <Descriptions.Item label="Temperatura">{parcela.control_tierra?.temperatura}°C</Descriptions.Item>
@@ -274,15 +259,13 @@ const ParcelsListWithDetails = () => {
               columns={columns}
               dataSource={parcelas}
               rowKey="id"
-              expandable={{
-                expandedRowRender: (record) => expandedRowRender(record),
-              }}
+              expandable={{ expandedRowRender }}
+              bordered
             />
           )}
         </Card>
       </Content>
 
-      {/* Footer */}
       <Footer style={{ textAlign: 'center', backgroundColor: '#004d40', color: '#fff' }}>
         Vino Costero ©2024 - Sistema de Control de Producción y Logística
       </Footer>

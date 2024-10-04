@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Table, Card, Collapse, Descriptions, Timeline, Button, message, Spin } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
@@ -83,24 +84,24 @@ const ParcelSoilControlOverview = () => {
       title: 'Humedad',
       dataIndex: ['ultimoControlTierra', 'humedad'],
       key: 'humedad',
+      align: 'center',
     },
     {
       title: 'Temperatura',
       dataIndex: ['ultimoControlTierra', 'temperatura'],
       key: 'temperatura',
+      align: 'center',
     },
     {
       title: 'Acciones',
       key: 'acciones',
+      align: 'center',
       render: (record) => (
         canCreate && (
-          <Button
-            type="primary"
+          <PlusOutlined
+            style={{ color: '#8B0000', fontSize: '18px' }}
             onClick={() => navigate(`/create-soil-control/${record.id}`)}
-            style={{ backgroundColor: '#8B0000', borderColor: '#8B0000' }}
-          >
-            Crear Control
-          </Button>
+          />
         )
       ),
     },
@@ -109,10 +110,9 @@ const ParcelSoilControlOverview = () => {
   // Función para mostrar los detalles del último control de tierra y el historial
   const expandedRowRender = (parcela) => {
     return (
-      <Collapse accordion>
-        {/* Último Control de Tierra */}
-        <Panel header="Último Control de Tierra" key="1">
-          <Descriptions column={1} bordered>
+      <Collapse accordion bordered={false} style={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
+        <Panel header={<span>Último Control de Tierra</span>} key="1" style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}>
+          <Descriptions size='small' column={1} bordered>
             <Descriptions.Item label="PH">{parcela.ultimoControlTierra?.ph || 'N/A'}</Descriptions.Item>
             <Descriptions.Item label="Humedad">{parcela.ultimoControlTierra?.humedad || 'N/A'}%</Descriptions.Item>
             <Descriptions.Item label="Temperatura">{parcela.ultimoControlTierra?.temperatura || 'N/A'}°C</Descriptions.Item>
@@ -120,16 +120,14 @@ const ParcelSoilControlOverview = () => {
             <Descriptions.Item label="Fecha">{parcela.ultimoControlTierra?.fecha || 'N/A'}</Descriptions.Item>
           </Descriptions>
         </Panel>
-
-        {/* Historial de Controles de Tierra */}
-        <Panel header="Historial de Controles de Tierra" key="2">
+        <Panel header={<span>Historial de Controles de Tierra</span>} key="2" style={{ backgroundColor: '#ffffff', borderRadius: '5px' }}>
           <Timeline>
             {parcela.controlesTierra.length > 0 ? (
               parcela.controlesTierra.map((control, index) => (
                 <Timeline.Item key={index}>
-                  <Collapse>
-                    <Panel header={`Control de Tierra del ${control.fecha}`} key={index + 1}>
-                      <Descriptions column={2} bordered>
+                  <Collapse bordered={false}>
+                    <Panel header={`Control de Tierra del ${control.fecha}`} key={index + 1} style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
+                      <Descriptions size='small' column={1} bordered>
                         <Descriptions.Item label="PH">{control.ph}</Descriptions.Item>
                         <Descriptions.Item label="Humedad">{control.humedad}%</Descriptions.Item>
                         <Descriptions.Item label="Temperatura">{control.temperatura}°C</Descriptions.Item>
@@ -151,7 +149,7 @@ const ParcelSoilControlOverview = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px 0' }}>
-        <Spin size="large" tip="Cargando tipos de uva..." />
+        <Spin size="large" tip="Cargando controles de tierra..." />
       </div>
     );
   }
@@ -164,27 +162,22 @@ const ParcelSoilControlOverview = () => {
       {/* Contenido Principal */}
       <Content style={{ padding: '24px' }}>
         <Card title="Visualización de Parcelas y Controles de Tierra" bordered={false} style={{ marginTop: 20 }}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <Spin tip="Cargando parcelas y controles de tierra..." />
-            </div>
-          ) : (
-            <>
-              {canCreate && (
-                <Button type="primary" style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }} onClick={() => navigate('/create-soil-control')}>
-                  Crear Control de Tierra
-                </Button>
-              )}
-              <Table
-                columns={columns}
-                dataSource={parcelas}
-                rowKey="id"
-                expandable={{
-                  expandedRowRender: (record) => expandedRowRender(record),
-                }}
-              />
-            </>
+          {canCreate && (
+            <Button
+              type="primary"
+              style={{ marginBottom: 16, backgroundColor: '#8B0000', borderColor: '#8B0000' }}
+              onClick={() => navigate('/create-soil-control')}
+            >
+              Crear Control de Tierra
+            </Button>
           )}
+          <Table
+            columns={columns}
+            dataSource={parcelas}
+            rowKey="id"
+            expandable={{ expandedRowRender }}
+            bordered
+          />
         </Card>
       </Content>
 

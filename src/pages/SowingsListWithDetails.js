@@ -85,25 +85,24 @@ const ParcelSowingOverview = () => {
       title: 'Tipo de Uva',
       dataIndex: ['siembraActual', 'tipoUva'],
       key: 'tipoUva',
+      align: 'center',
     },
     {
       title: 'Cantidad de Plantas',
       dataIndex: ['siembraActual', 'cantidadPlantas'],
       key: 'cantidadPlantas',
+      align: 'center',
     },
     {
       title: 'Acciones',
       key: 'acciones',
+      align: 'center',
       render: (parcela) => (
         canCreateOrEdit && (
-          <Button
-            type="default"
-            icon={<EditOutlined />}
-            style={{ color: '#52c41a' }} // Verde para la siembra
+          <EditOutlined
+            style={{ color: '#8B0000', fontSize: '18px' }}
             onClick={() => navigate(`/edit-sowing/${parcela.id}`)}
-          >
-            Editar
-          </Button>
+          />
         )
       ),
     },
@@ -112,14 +111,10 @@ const ParcelSowingOverview = () => {
   // Función para mostrar los detalles de la siembra actual y el historial de siembras
   const expandedRowRender = (parcela) => {
     return (
-      <Collapse accordion>
-        {/* Siembra Actual */}
-        <Panel
-          header="Siembra Actual"
-          key="1"
-        >
+      <Collapse accordion bordered={false} style={{ backgroundColor: '#f9f9f9', borderRadius: '5px' }}>
+        <Panel header="Siembra Actual" key="1" style={{ backgroundColor: '#ffffff', borderRadius: '5px', marginBottom: '5px' }}>
           {parcela.siembraActual ? (
-            <Descriptions column={2} bordered>
+            <Descriptions size='small' column={2} bordered>
               <Descriptions.Item label="Tipo de Uva">{parcela.siembraActual.tipoUva}</Descriptions.Item>
               <Descriptions.Item label="Cantidad de Plantas">{parcela.siembraActual.cantidadPlantas}</Descriptions.Item>
               <Descriptions.Item label="Técnica de Siembra">{parcela.siembraActual.tecnica}</Descriptions.Item>
@@ -129,16 +124,14 @@ const ParcelSowingOverview = () => {
             <p>No hay siembra activa en esta parcela.</p>
           )}
         </Panel>
-
-        {/* Historial de Siembras */}
-        <Panel header="Historial de Siembras" key="2">
-          {parcela.historialSiembras.length > 0 ? (
-            <Timeline>
-              {parcela.historialSiembras.map((siembra, index) => (
+        <Panel header="Historial de Siembras" key="2" style={{ backgroundColor: '#ffffff', borderRadius: '5px' }}>
+          <Timeline>
+            {parcela.historialSiembras.length > 0 ? (
+              parcela.historialSiembras.map((siembra, index) => (
                 <Timeline.Item key={index}>
-                  <Collapse>
-                    <Panel header={`Siembra del ${siembra.fechaCreacion}`} key={index + 1}>
-                      <Descriptions column={2} bordered>
+                  <Collapse bordered={false}>
+                    <Panel header={`Siembra del ${siembra.fechaCreacion}`} key={index + 1} style={{ backgroundColor: '#f5f5f5', borderRadius: '5px' }}>
+                      <Descriptions size='small' column={1} bordered>
                         <Descriptions.Item label="Tipo de Uva">{siembra.tipoUva}</Descriptions.Item>
                         <Descriptions.Item label="Cantidad de Plantas">{siembra.cantidadPlantas}</Descriptions.Item>
                         <Descriptions.Item label="Técnica de Siembra">{siembra.tecnica}</Descriptions.Item>
@@ -147,11 +140,11 @@ const ParcelSowingOverview = () => {
                     </Panel>
                   </Collapse>
                 </Timeline.Item>
-              ))}
-            </Timeline>
-          ) : (
-            <p>No hay historial de siembras.</p>
-          )}
+              ))
+            ) : (
+              <p>No hay historial de siembras.</p>
+            )}
+          </Timeline>
         </Panel>
       </Collapse>
     );
@@ -183,9 +176,8 @@ const ParcelSowingOverview = () => {
             columns={columns}
             dataSource={parcelas}
             rowKey="id"
-            expandable={{
-              expandedRowRender: (record) => expandedRowRender(record),
-            }}
+            expandable={{ expandedRowRender }}
+            bordered
           />
         </Card>
       </Content>
