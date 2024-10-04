@@ -3,10 +3,9 @@ import { Layout, Form, Input, Button, InputNumber, message, Card, Collapse, Sele
 import { useParams, useNavigate } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 const { Option } = Select;
-const { Title, Text } = Typography;
 
 // Estados disponibles para la parcela
 const estadosParcelas = ['Disponible', 'Ocupada'];
@@ -143,7 +142,7 @@ const ParcelForm = () => {
 
       {/* Contenido Principal */}
       <Content style={{ paddingBottom: '24px' }}>
-        <Card title={isEditing ? `Editar Parcela` : `Registrar Nueva Parcela`} bordered={false} style={{ maxWidth: 900, margin: '0 auto', marginTop: 50 }}>
+        <Card title={isEditing ? `Editar Parcela` : `Registrar Nueva Parcela`} bordered={false} style={{ marginTop: 20, maxWidth: '800px', margin: '0 auto' }}>
           {loadingData ? (
             <Spin tip="Cargando datos..." />
           ) : (
@@ -155,7 +154,6 @@ const ParcelForm = () => {
               onFinishFailed={onFinishFailed}
               style={{ marginBottom: '30px' }}
             >
-              <Title level={4}>Datos Generales</Title>
               <Row gutter={16}>
                 <Col span={12}>
                   <Form.Item

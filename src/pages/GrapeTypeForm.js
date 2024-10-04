@@ -6,7 +6,6 @@ import NavBarMenu from './NavBarMenu';
 const { Content, Footer } = Layout;
 const { Option } = Select;
 const { Panel } = Collapse;
-const { Title } = Typography;
 
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
@@ -220,7 +219,7 @@ const CreateOrEditGrapeType = () => {
 
       {/* Contenido principal */}
       <Content style={{ padding: '24px', width: '1000px', margin: 'auto' }}>
-        <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20 }}>
+        <Card title={isEditMode ? 'Modificar Tipo de Uva' : 'Registrar Nuevo Tipo de Uva'} bordered={false} style={{ marginTop: 20, maxWidth: '800px', margin: '0 auto' }}>
           <Form form={form} layout="vertical" name="create-edit-grape-type" onFinish={onFinish}>
             {/* Selección de Parcelas */}
             {parcelas && parcelas.length > 0 && (
@@ -284,7 +283,7 @@ const CreateOrEditGrapeType = () => {
 
             <Form.Item>
               <Button type="primary" htmlType="submit" style={{ width: '100%', backgroundColor: '#8B0000', borderColor: '#8B0000' }}>
-                {isEditMode ? 'Guardar Cambios' : 'Registrar Uva'}
+                {isEditMode ? 'Guardar Cambios' : 'Registrar Tipo de Uva'}
               </Button>
             </Form.Item>
           </Form>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse, Spin } from 'antd';
+import { Layout, Form, InputNumber, Button, Card, Select, Descriptions, Input, message, Collapse, Spin, Row, Col, } from 'antd';
 import { useParams, useNavigate } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 
@@ -200,30 +200,39 @@ const RegisterSoilControl = () => {
               </Collapse>
             )}
 
-            {/* Campos del formulario para ingresar los datos del nuevo control de tierra */}
-            <Form.Item
-              label="PH de la Tierra"
-              name="ph"
-              rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
-            >
-              <InputNumber min={0} max={14} step={0.1} placeholder="PH" style={{ width: '100%' }} />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                {/* Campos del formulario para ingresar los datos del nuevo control de tierra */}
+                <Form.Item
+                  label="PH de la Tierra"
+                  name="ph"
+                  rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
+                >
+                  <InputNumber min={0} max={14} step={0.1} placeholder="PH" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="Humedad (%)"
+                  name="humedad"
+                  rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}
+                >
+                  <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Form.Item
-              label="Humedad (%)"
-              name="humedad"
-              rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}
-            >
-              <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              label="Temperatura (°C)"
-              name="temperatura"
-              rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}
-            >
-              <InputNumber min={-50} max={50} placeholder="Temperatura" style={{ width: '100%' }} />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="Temperatura (°C)"
+                  name="temperatura"
+                  rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}
+                >
+                  <InputNumber min={-50} max={50} placeholder="Temperatura" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
 
             <Form.Item label="Observaciones" name="observaciones">
               <Input.TextArea placeholder="Ingrese observaciones" rows={4} />

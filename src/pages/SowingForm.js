@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Form, InputNumber, Button, Card, Select, DatePicker, Input, Descriptions, message, Collapse, Spin } from 'antd';
+import { Layout, Form, InputNumber, Button, Card, Select, DatePicker, Input, Descriptions, message, Collapse, Spin, Row, Col } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import NavBarMenu from './NavBarMenu';
 import moment from 'moment';
@@ -66,7 +66,7 @@ const CreateOrEditSowing = () => {
         const data = await response.json();
         const parcelasDisponibles = !window.location.pathname.includes('edit-sowing') ? data.filter(parcela => !parcela.siembra_activa) : data;
         setParcelas(parcelasDisponibles);
-  
+
         if (window.location.pathname.includes('edit-sowing')) {
           setIsEditMode(true);
           await fetchSiembra(parcelasDisponibles);
@@ -78,7 +78,7 @@ const CreateOrEditSowing = () => {
         setLoading(false);
       }
     };
-  
+
     const fetchTiposDeUva = async () => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
@@ -97,7 +97,7 @@ const CreateOrEditSowing = () => {
         }
         const data = await response.json();
         setTiposDeUva(data);
-  
+
         // Si ya tienes una siembra cargada, selecciona el tipo de uva una vez que los tipos de uva estén cargados
         if (siembra) {
           const uva = data.find((t) => t.nombre === siembra.tipo_uva);
@@ -107,7 +107,7 @@ const CreateOrEditSowing = () => {
         message.error('Error al cargar los tipos de uva');
       }
     };
-  
+
     const fetchSiembra = async (parcelasDisponibles) => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
@@ -126,10 +126,10 @@ const CreateOrEditSowing = () => {
         }
         const siembraData = await response.json();
         setSiembra(siembraData);
-  
+
         const parcela = parcelasDisponibles.find((p) => p.id === siembraData.id_parcela);
         setSelectedParcela(parcela);
-  
+
         form.setFieldsValue({
           parcela: parcela.id,
           id_tipo_uva: siembraData.tipo_uva,
@@ -138,14 +138,14 @@ const CreateOrEditSowing = () => {
           tecnica_siembra: siembraData.tecnica_siembra,
           observaciones_siembra: siembraData.observaciones_siembra,
         });
-  
+
         // Cargar tipos de uva después de cargar la siembra
         await fetchTiposDeUva();
       } catch (error) {
         message.error('Error al cargar la siembra');
       }
     };
-  
+
     fetchParcelas();
   }, [id, form, siembra]);
 
@@ -204,9 +204,12 @@ const CreateOrEditSowing = () => {
     }
   };
 
-  // Mostrar un spinner si los datos aún no están listos
   if (loading) {
-    return <Spin tip="Cargando parcelas y tipos de uva..." />;
+    return (
+      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+        <Spin size="large" tip="Cargando tipos de uva..." />
+      </div>
+    );
   }
 
   return (
@@ -216,7 +219,7 @@ const CreateOrEditSowing = () => {
 
       {/* Contenido principal */}
       <Content style={{ padding: '24px' }}>
-        <Card title={isEditMode ? 'Modificar Siembra' : 'Registrar Nueva Siembra'} bordered={false} style={{ marginTop: 20 }}>
+        <Card title={isEditMode ? 'Modificar Siembra' : 'Registrar Nueva Siembra'} bordered={false} style={{ marginTop: 20, maxWidth: '800px', margin: '0 auto' }}>
           <Form form={form} layout="vertical" name="create-sowing" onFinish={onFinish}>
 
             {/* Selección de Parcela */}
@@ -271,7 +274,7 @@ const CreateOrEditSowing = () => {
             <Form.Item
               label="Tipo de Uva"
               name="id_tipo_uva"
-              // rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
+            // rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
             >
               <Select placeholder="Seleccione el tipo de uva" disabled={isEditMode} onChange={handleUvaChange}>
                 {tiposDeUva.map((uva, index) => (
@@ -297,32 +300,41 @@ const CreateOrEditSowing = () => {
               </Collapse>
             )}
 
-            {/* Fecha de Plantación */}
-            <Form.Item
-              label="Fecha de Plantación"
-              name="fecha_plantacion"
-              rules={[{ required: true, message: 'Por favor, seleccione la fecha de plantación' }]}
-            >
-              <DatePicker style={{ width: '100%' }} />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                {/* Fecha de Plantación */}
+                <Form.Item
+                  label="Fecha de Plantación"
+                  name="fecha_plantacion"
+                  rules={[{ required: true, message: 'Por favor, seleccione la fecha de plantación' }]}
+                >
+                  <DatePicker style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                {/* Cantidad de Plantas */}
+                <Form.Item
+                  label="Cantidad de Plantas"
+                  name="cantidad_plantas"
+                  rules={[{ required: true, message: 'Por favor, ingrese la cantidad de plantas' }]}
+                >
+                  <InputNumber min={1} placeholder="Cantidad de Plantas" style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            {/* Cantidad de Plantas */}
-            <Form.Item
-              label="Cantidad de Plantas"
-              name="cantidad_plantas"
-              rules={[{ required: true, message: 'Por favor, ingrese la cantidad de plantas' }]}
-            >
-              <InputNumber min={1} placeholder="Cantidad de Plantas" style={{ width: '100%' }} />
-            </Form.Item>
-
-            {/* Técnica de Siembra */}
-            <Form.Item
-              label="Técnica de Siembra"
-              name="tecnica_siembra"
-              rules={[{ required: true, message: 'Por favor, ingrese la técnica de siembra utilizada' }]}
-            >
-              <Input placeholder="Técnica de Siembra (Ej: Siembra directa, Trasplante)" />
-            </Form.Item>
+            <Row gutter={16}>
+              <Col span={12}>
+                {/* Técnica de Siembra */}
+                <Form.Item
+                  label="Técnica de Siembra"
+                  name="tecnica_siembra"
+                  rules={[{ required: true, message: 'Por favor, ingrese la técnica de siembra utilizada' }]}
+                >
+                  <Input placeholder="Técnica de Siembra (Ej: Siembra directa, Trasplante)" />
+                </Form.Item>
+              </Col>
+            </Row>
 
             {/* Observaciones de la siembra */}
             <Form.Item

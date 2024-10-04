@@ -100,7 +100,7 @@ const NavBarMenu = ({ defaultSelectedKeys }) => {
         <Menu
           theme="dark"
           mode="horizontal"
-          defaultSelectedKeys={defaultSelectedKeys ? defaultSelectedKeys : null}
+          selectedKeys={null}
           style={{ backgroundColor: '#004d40', flexGrow: 1, justifyContent: 'center', borderBottom: 'none' }}
           onClick={handleMenuClick} // Evento para manejar clicks
         >
