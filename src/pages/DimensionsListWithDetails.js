@@ -7,6 +7,8 @@ import NavBarMenu from './NavBarMenu';
 const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Función para calcular el área ocupada (longitud * anchura en metros cuadrados)
 const calcularAreaOcupada = (longitud, anchura) => {
   const areaOcupada = longitud * anchura; // Área en metros cuadrados
@@ -55,7 +57,7 @@ const ParcelDimensionsOverview = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`${process.env.BACKEND_HOST}/dimensiones`, {
+      const response = await fetch(`${BACKEND_HOST}/dimensiones`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',

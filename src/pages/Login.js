@@ -5,6 +5,8 @@ import axios from 'axios';
 
 const { Title, Text } = Typography;
 
+const { BACKEND_HOST } = require('../config/config');
+
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ const Login = () => {
     setLoading(true);
     try {
       // Petición al backend para autenticar usuario
-      const response = await axios.post(`${process.env.BACKEND_HOST}/auth/login`, {
+      const response = await axios.post(`${BACKEND_HOST}/auth/login`, {
         username: values.usuario,
         password: values.contrasena,
       });

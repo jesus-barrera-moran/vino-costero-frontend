@@ -7,6 +7,8 @@ const { Content, Footer } = Layout;
 const { Option } = Select;
 const { Panel } = Collapse;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
   const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
@@ -49,7 +51,7 @@ const CreateOrEditGrapeType = () => {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
 
         // Obtener todas las parcelas
-        const parcelasResponse = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
+        const parcelasResponse = await fetch(`${BACKEND_HOST}/parcelas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -70,7 +72,7 @@ const CreateOrEditGrapeType = () => {
 
         if (id) {
           // Si hay un ID en la URL, estamos en modo de edición
-          const tipoUvaResponse = await fetch(`${process.env.BACKEND_HOST}/tiposUvas/${id}`, {
+          const tipoUvaResponse = await fetch(`${BACKEND_HOST}/tiposUvas/${id}`, {
             headers: {
               'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
               'Content-Type': 'application/json',
@@ -113,8 +115,8 @@ const CreateOrEditGrapeType = () => {
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const url = isEditMode
-        ? `${process.env.BACKEND_HOST}/tiposUvas/${id}`
-        : `${process.env.BACKEND_HOST}/tiposUvas`;
+        ? `${BACKEND_HOST}/tiposUvas/${id}`
+        : `${BACKEND_HOST}/tiposUvas`;
       const method = isEditMode ? 'PUT' : 'POST';
 
       const payload = {

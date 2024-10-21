@@ -8,6 +8,8 @@ const { Option } = Select;
 const { Panel } = Collapse;
 const { Content, Footer } = Layout;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
   const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
@@ -50,7 +52,7 @@ const CreateOrEditSowing = () => {
     const fetchParcelas = async () => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
-        const response = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
+        const response = await fetch(`${BACKEND_HOST}/parcelas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -82,7 +84,7 @@ const CreateOrEditSowing = () => {
     const fetchTiposDeUva = async () => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
-        const response = await fetch(`${process.env.BACKEND_HOST}/tiposUvas`, {
+        const response = await fetch(`${BACKEND_HOST}/tiposUvas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -111,7 +113,7 @@ const CreateOrEditSowing = () => {
     const fetchSiembra = async (parcelasDisponibles) => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
-        const response = await fetch(`${process.env.BACKEND_HOST}/siembras/${id}`, {
+        const response = await fetch(`${BACKEND_HOST}/siembras/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -164,8 +166,8 @@ const CreateOrEditSowing = () => {
   const onFinish = async (values) => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
     const url = isEditMode
-      ? `${process.env.BACKEND_HOST}/siembras/${id}` // Para actualizar siembra existente
-      : `${process.env.BACKEND_HOST}/siembras`; // Para crear una nueva siembra
+      ? `${BACKEND_HOST}/siembras/${id}` // Para actualizar siembra existente
+      : `${BACKEND_HOST}/siembras`; // Para crear una nueva siembra
     const method = isEditMode ? 'PUT' : 'POST'; // Determinar el método según el modo
 
     try {

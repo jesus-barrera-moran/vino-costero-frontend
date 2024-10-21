@@ -7,6 +7,8 @@ import NavBarMenu from './NavBarMenu';
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Constantes de roles
 const ROLES = [
   { id_rol: 1, nombre: 'Administrador del Sistema' },
@@ -59,7 +61,7 @@ const CreateOrEditUser = () => {
       const fetchUsuario = async () => {
         const token = localStorage.getItem('token');
         try {
-          const response = await axios.get(`${process.env.BACKEND_HOST}/auth/usuarios/${username}`, {
+          const response = await axios.get(`${BACKEND_HOST}/auth/usuarios/${username}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const usuario = response.data;
@@ -91,7 +93,7 @@ const CreateOrEditUser = () => {
     const token = localStorage.getItem('token');
     try {
       if (isEditMode) {
-        await axios.put(`${process.env.BACKEND_HOST}/auth/update/${username}`, {
+        await axios.put(`${BACKEND_HOST}/auth/update/${username}`, {
           nombre: values.nombre,
           apellido: values.apellido,
           correo: values.email,
@@ -101,7 +103,7 @@ const CreateOrEditUser = () => {
         });
         message.success('Usuario actualizado exitosamente');
       } else {
-        await axios.post(`${process.env.BACKEND_HOST}/auth/register`, {
+        await axios.post(`${BACKEND_HOST}/auth/register`, {
           username: values.usuario,
           password: values.contrasena,
           nombre: values.nombre,

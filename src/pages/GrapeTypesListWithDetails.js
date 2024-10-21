@@ -7,6 +7,8 @@ import NavBarMenu from './NavBarMenu';
 const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
   const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
@@ -45,7 +47,7 @@ const GrapeTypeOverview = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`${process.env.BACKEND_HOST}/tiposUvas`, {
+      const response = await fetch(`${BACKEND_HOST}/tiposUvas`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',

@@ -6,6 +6,8 @@ import NavBarMenu from './NavBarMenu';
 const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
   const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
@@ -45,7 +47,7 @@ const RegisterSoilControl = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
+      const response = await fetch(`${BACKEND_HOST}/parcelas`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',
@@ -97,7 +99,7 @@ const RegisterSoilControl = () => {
 
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`${process.env.BACKEND_HOST}/controlesTierra/${selectedParcela.id}`, {
+      const response = await fetch(`${BACKEND_HOST}/controlesTierra/${selectedParcela.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

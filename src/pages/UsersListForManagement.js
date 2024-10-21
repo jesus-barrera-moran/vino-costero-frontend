@@ -7,6 +7,8 @@ import NavBarMenu from './NavBarMenu';
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Lista de roles
 const ROLES = [
   { id_rol: 1, nombre: 'Administrador del Sistema' },
@@ -51,7 +53,7 @@ const UserManagement = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${process.env.BACKEND_HOST}/auth/usuarios`, {
+        const response = await axios.get(`${BACKEND_HOST}/auth/usuarios`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsuarios(response.data);
@@ -102,7 +104,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `${process.env.BACKEND_HOST}/auth/usuarios/batch`,
+        `${BACKEND_HOST}/auth/usuarios/batch`,
         { usuarios: changes },
         { headers: { Authorization: `Bearer ${token}` } }
       );

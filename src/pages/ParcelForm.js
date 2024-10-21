@@ -7,6 +7,8 @@ const { Content, Footer } = Layout;
 const { Panel } = Collapse;
 const { Option } = Select;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Estados disponibles para la parcela
 const estadosParcelas = ['Disponible', 'Ocupada'];
 
@@ -52,7 +54,7 @@ const ParcelForm = () => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
     if (isEditing) {
       setLoadingData(true);
-      fetch(`${process.env.BACKEND_HOST}/parcelas/${id}`, {
+      fetch(`${BACKEND_HOST}/parcelas/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`, // Incluir el token en la cabecera de autorización
           'Content-Type': 'application/json',
@@ -90,8 +92,8 @@ const ParcelForm = () => {
   const onFinish = async (values) => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
     const url = isEditing
-      ? `${process.env.BACKEND_HOST}/parcelas/${id}` // Para editar
-      : `${process.env.BACKEND_HOST}/parcelas`; // Para crear
+      ? `${BACKEND_HOST}/parcelas/${id}` // Para editar
+      : `${BACKEND_HOST}/parcelas`; // Para crear
 
     const method = isEditing ? 'PUT' : 'POST'; // Elegir el método de la solicitud
 

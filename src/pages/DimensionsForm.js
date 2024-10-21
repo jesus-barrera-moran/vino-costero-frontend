@@ -6,6 +6,8 @@ import NavBarMenu from './NavBarMenu';
 const { Header, Content, Footer } = Layout;
 const { Panel } = Collapse;
 
+const { BACKEND_HOST } = require('../config/config');
+
 // Función para calcular el área ocupada
 const calcularAreaOcupada = (longitud, anchura) => {
   return (longitud * anchura) / 10000; // Convertir de m² a hectáreas
@@ -52,7 +54,7 @@ const EditParcelDimensions = () => {
   const fetchParcela = async () => {
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`${process.env.BACKEND_HOST}/parcelas/${id}`, {
+      const response = await fetch(`${BACKEND_HOST}/parcelas/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',
@@ -115,7 +117,7 @@ const EditParcelDimensions = () => {
   const onFinish = async (values) => {
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`${process.env.BACKEND_HOST}/dimensiones/${id}`, {
+      const response = await fetch(`${BACKEND_HOST}/dimensiones/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
