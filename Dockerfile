@@ -1,29 +1,26 @@
 # Usa la imagen oficial de Node.js como base
-FROM node:18-alpine AS build
+FROM node:18
 
 # Establece el directorio de trabajo en /app
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copia el package.json y el package-lock.json (si existe)
 COPY package*.json ./
 
-# Instala las dependencias
+# Instala las dependencias de la aplicación
 RUN npm install
 
-# Copia el resto del código de la aplicación al contenedor
+# Copia el resto de los archivos de la aplicación al contenedor
 COPY . .
 
-# Compila la aplicación para producción
-RUN npm run build
+# Establece la variable de entorno para producción
+ENV NODE_ENV=staging
 
-# Usa una imagen de servidor web ligero para servir el contenido estático
-FROM nginx:alpine
+# Establece la variable de entorno del puerto para Google Cloud Run
+ENV PORT=3001
 
-# Copia los archivos compilados al directorio que NGINX utiliza para servir archivos estáticos
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Expone el puerto 3001 para el contenedor
+# Expone el puerto en el que se ejecutará la aplicación
 EXPOSE 3001
 
-# Inicia NGINX
-CMD ["nginx", "-g", "daemon off;"]
+# Comando para ejecutar la aplicación
+CMD ["npm", "start"]
