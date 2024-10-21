@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
     try {
       // Petición al backend para autenticar usuario
-      const response = await axios.post('http://localhost:3000/auth/login', {
+      const response = await axios.post(`${process.env.BACKEND_HOST}/auth/login`, {
         username: values.usuario,
         password: values.contrasena,
       });

@@ -45,7 +45,7 @@ const GrapeTypeOverview = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch('http://localhost:3000/tiposUvas', {
+      const response = await fetch(`${process.env.BACKEND_HOST}/tiposUvas`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',

@@ -49,7 +49,7 @@ const CreateOrEditGrapeType = () => {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
 
         // Obtener todas las parcelas
-        const parcelasResponse = await fetch('http://localhost:3000/parcelas', {
+        const parcelasResponse = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ const CreateOrEditGrapeType = () => {
 
         if (id) {
           // Si hay un ID en la URL, estamos en modo de edición
-          const tipoUvaResponse = await fetch(`http://localhost:3000/tiposUvas/${id}`, {
+          const tipoUvaResponse = await fetch(`${process.env.BACKEND_HOST}/tiposUvas/${id}`, {
             headers: {
               'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
               'Content-Type': 'application/json',
@@ -113,8 +113,8 @@ const CreateOrEditGrapeType = () => {
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
       const url = isEditMode
-        ? `http://localhost:3000/tiposUvas/${id}`
-        : 'http://localhost:3000/tiposUvas';
+        ? `${process.env.BACKEND_HOST}/tiposUvas/${id}`
+        : `${process.env.BACKEND_HOST}/tiposUvas`;
       const method = isEditMode ? 'PUT' : 'POST';
 
       const payload = {

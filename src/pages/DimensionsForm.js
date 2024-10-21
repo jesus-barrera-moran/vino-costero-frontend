@@ -52,7 +52,7 @@ const EditParcelDimensions = () => {
   const fetchParcela = async () => {
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`http://localhost:3000/parcelas/${id}`, {
+      const response = await fetch(`${process.env.BACKEND_HOST}/parcelas/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ const EditParcelDimensions = () => {
   const onFinish = async (values) => {
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`http://localhost:3000/dimensiones/${id}`, {
+      const response = await fetch(`${process.env.BACKEND_HOST}/dimensiones/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

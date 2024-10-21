@@ -46,7 +46,7 @@ const ParcelsListWithDetails = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token'); // Obtener el token
-        const response = await fetch('http://localhost:3000/parcelas', {
+        const response = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',

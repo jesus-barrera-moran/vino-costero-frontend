@@ -59,7 +59,7 @@ const CreateOrEditUser = () => {
       const fetchUsuario = async () => {
         const token = localStorage.getItem('token');
         try {
-          const response = await axios.get(`http://localhost:3000/auth/usuarios/${username}`, {
+          const response = await axios.get(`${process.env.BACKEND_HOST}/auth/usuarios/${username}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const usuario = response.data;
@@ -91,7 +91,7 @@ const CreateOrEditUser = () => {
     const token = localStorage.getItem('token');
     try {
       if (isEditMode) {
-        await axios.put(`http://localhost:3000/auth/update/${username}`, {
+        await axios.put(`${process.env.BACKEND_HOST}/auth/update/${username}`, {
           nombre: values.nombre,
           apellido: values.apellido,
           correo: values.email,
@@ -101,7 +101,7 @@ const CreateOrEditUser = () => {
         });
         message.success('Usuario actualizado exitosamente');
       } else {
-        await axios.post('http://localhost:3000/auth/register', {
+        await axios.post(`${process.env.BACKEND_HOST}/auth/register`, {
           username: values.usuario,
           password: values.contrasena,
           nombre: values.nombre,

@@ -51,7 +51,7 @@ const UserManagement = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3000/auth/usuarios', {
+        const response = await axios.get(`${process.env.BACKEND_HOST}/auth/usuarios`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsuarios(response.data);
@@ -102,7 +102,7 @@ const UserManagement = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        'http://localhost:3000/auth/usuarios/batch',
+        `${process.env.BACKEND_HOST}/auth/usuarios/batch`,
         { usuarios: changes },
         { headers: { Authorization: `Bearer ${token}` } }
       );

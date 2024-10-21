@@ -52,7 +52,7 @@ const ParcelForm = () => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
     if (isEditing) {
       setLoadingData(true);
-      fetch(`http://localhost:3000/parcelas/${id}`, {
+      fetch(`${process.env.BACKEND_HOST}/parcelas/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`, // Incluir el token en la cabecera de autorización
           'Content-Type': 'application/json',
@@ -90,8 +90,8 @@ const ParcelForm = () => {
   const onFinish = async (values) => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
     const url = isEditing
-      ? `http://localhost:3000/parcelas/${id}` // Para editar
-      : 'http://localhost:3000/parcelas'; // Para crear
+      ? `${process.env.BACKEND_HOST}/parcelas/${id}` // Para editar
+      : `${process.env.BACKEND_HOST}/parcelas`; // Para crear
 
     const method = isEditing ? 'PUT' : 'POST'; // Elegir el método de la solicitud
 

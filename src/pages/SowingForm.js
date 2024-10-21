@@ -50,7 +50,7 @@ const CreateOrEditSowing = () => {
     const fetchParcelas = async () => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
-        const response = await fetch('http://localhost:3000/parcelas', {
+        const response = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const CreateOrEditSowing = () => {
     const fetchTiposDeUva = async () => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
-        const response = await fetch('http://localhost:3000/tiposUvas', {
+        const response = await fetch(`${process.env.BACKEND_HOST}/tiposUvas`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ const CreateOrEditSowing = () => {
     const fetchSiembra = async (parcelasDisponibles) => {
       try {
         const token = localStorage.getItem('token'); // Obtener el token del localStorage
-        const response = await fetch(`http://localhost:3000/siembras/${id}`, {
+        const response = await fetch(`${process.env.BACKEND_HOST}/siembras/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
             'Content-Type': 'application/json',
@@ -164,8 +164,8 @@ const CreateOrEditSowing = () => {
   const onFinish = async (values) => {
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
     const url = isEditMode
-      ? `http://localhost:3000/siembras/${id}` // Para actualizar siembra existente
-      : 'http://localhost:3000/siembras'; // Para crear una nueva siembra
+      ? `${process.env.BACKEND_HOST}/siembras/${id}` // Para actualizar siembra existente
+      : `${process.env.BACKEND_HOST}/siembras`; // Para crear una nueva siembra
     const method = isEditMode ? 'PUT' : 'POST'; // Determinar el método según el modo
 
     try {

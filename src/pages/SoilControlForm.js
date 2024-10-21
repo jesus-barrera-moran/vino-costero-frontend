@@ -45,7 +45,7 @@ const RegisterSoilControl = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch('http://localhost:3000/parcelas', {
+      const response = await fetch(`${process.env.BACKEND_HOST}/parcelas`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const RegisterSoilControl = () => {
 
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch(`http://localhost:3000/controlesTierra/${selectedParcela.id}`, {
+      const response = await fetch(`${process.env.BACKEND_HOST}/controlesTierra/${selectedParcela.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

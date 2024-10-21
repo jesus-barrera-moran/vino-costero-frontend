@@ -44,7 +44,7 @@ const ParcelSoilControlOverview = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token'); // Obtener el token del localStorage
-      const response = await fetch('http://localhost:3000/controlesTierra', {
+      const response = await fetch(`${process.env.BACKEND_HOST}/controlesTierra`, {
         headers: {
           'Authorization': `Bearer ${token}`,  // Incluir el token en la cabecera
           'Content-Type': 'application/json',
