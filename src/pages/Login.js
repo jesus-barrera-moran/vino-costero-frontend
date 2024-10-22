@@ -34,7 +34,7 @@ const Login = () => {
         localStorage.setItem('roles', JSON.stringify(response.data.roles));
         localStorage.setItem('username', response.data.username);
 
-        message.success('Inicio de sesión exitoso');
+        message.success('Inicio de sesión exitoso', 1);
         navigate('/'); // Redirigir al dashboard o la pantalla principal
       } else {
         message.error('Nombre de usuario o contraseña incorrectos');
