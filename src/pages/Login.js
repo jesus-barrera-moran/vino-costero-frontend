@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Card, message, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CryptoJS from 'crypto-js'; // Importar CryptoJS para la encriptación
 
 const { Title, Text } = Typography;
 
 const { BACKEND_HOST } = require('../config/config');
+
+// Clave de encriptación (usa una más segura y ocúltala en variables de entorno)
+const SECRET_KEY = 'tuClaveSecreta';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -19,13 +23,23 @@ const Login = () => {
     }
   }, [navigate]);
 
+  // Función para encriptar credenciales
+  const encryptCredentials = (username, password) => {
+    const encryptedUsername = CryptoJS.AES.encrypt(username, SECRET_KEY).toString();
+    const encryptedPassword = CryptoJS.AES.encrypt(password, SECRET_KEY).toString();
+    return { encryptedUsername, encryptedPassword };
+  };
+
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Petición al backend para autenticar usuario
+      // Encriptar las credenciales antes de enviarlas
+      const { encryptedUsername, encryptedPassword } = encryptCredentials(values.usuario, values.contrasena);
+
+      // Petición al backend con credenciales encriptadas
       const response = await axios.post(`${BACKEND_HOST}/auth/login`, {
-        username: values.usuario,
-        password: values.contrasena,
+        username: encryptedUsername,
+        password: encryptedPassword,
       });
 
       if (response.data.token) {

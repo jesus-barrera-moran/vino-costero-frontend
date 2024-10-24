@@ -3,6 +3,7 @@ import { Layout, Form, Input, Button, Select, Card, message, Spin, Row, Col } fr
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import NavBarMenu from './NavBarMenu';
+import CryptoJS from 'crypto-js'; // Importar CryptoJS para la encriptación
 
 const { Option } = Select;
 const { Header, Content, Footer } = Layout;
@@ -18,10 +19,18 @@ const ROLES = [
   { id_rol: 5, nombre: 'Auditor' }
 ];
 
+// Clave de encriptación (debe ser la misma usada en el backend)
+const ENCRYPTION_KEY = 'tuClaveSecreta';
+
 // Función para verificar permisos
 const checkPermission = (allowedRoles) => {
   const userRoles = JSON.parse(localStorage.getItem("roles")) || [];
   return Array.isArray(userRoles) ? userRoles.some(role => allowedRoles.includes(role)) : allowedRoles.includes(userRoles);
+};
+
+// Función para encriptar texto
+const encryptText = (text) => {
+  return CryptoJS.AES.encrypt(text, ENCRYPTION_KEY).toString();
 };
 
 const CreateOrEditUser = () => {
@@ -97,7 +106,7 @@ const CreateOrEditUser = () => {
           nombre: values.nombre,
           apellido: values.apellido,
           correo: values.email,
-          contrasena: values.contrasena || undefined,
+          contrasena: values.contrasena ? encryptText(values.contrasena) : undefined, // Encriptar la contraseña si se proporciona
         }, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -105,7 +114,7 @@ const CreateOrEditUser = () => {
       } else {
         await axios.post(`${BACKEND_HOST}/auth/register`, {
           username: values.usuario,
-          password: values.contrasena,
+          password: encryptText(values.contrasena), // Encriptar la contraseña antes de enviarla
           nombre: values.nombre,
           apellido: values.apellido,
           correo: values.email,
