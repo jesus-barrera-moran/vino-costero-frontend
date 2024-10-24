@@ -252,37 +252,37 @@ const CreateOrEditGrapeType = () => {
               </div>
             )}
 
-            <Form.Item label="Nombre de la Uva" name="nombre" rules={[{ required: true, message: 'Por favor, ingrese el nombre de la uva' }]}>
+            <Form.Item label="Nombre de la Uva" name="nombre" >
               <Input placeholder="Nombre de la uva" />
             </Form.Item>
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Humedad (%)" name="humedad" rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}>
-                  <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+                <Form.Item label="Humedad (%)" name="humedad" >
+                  <InputNumber placeholder="Humedad" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Temperatura (°C)" name="temperatura" rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}>
-                  <InputNumber min={0} placeholder="Temperatura" style={{ width: '100%' }} />
+                <Form.Item label="Temperatura (°C)" name="temperatura" >
+                  <InputNumber placeholder="Temperatura" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
 
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="PH del Suelo" name="ph" rules={[{ required: true, message: 'Por favor, ingrese el PH del suelo' }]}>
-                  <InputNumber min={0} max={14} placeholder="PH del suelo" style={{ width: '100%' }} />
+                <Form.Item label="PH del Suelo" name="ph" >
+                  <InputNumber placeholder="PH del suelo" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" rules={[{ required: true, message: 'Por favor, ingrese el tiempo estimado de cosecha' }]}>
-                  <InputNumber min={1} placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
+                <Form.Item label="Tiempo de Cosecha (días)" name="tiempo_cosecha" >
+                  <InputNumber placeholder="Tiempo de cosecha" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
 
-            <Form.Item label="Descripción" name="descripcion" rules={[{ required: true, message: 'Por favor, ingrese una descripción' }]}>
+            <Form.Item label="Descripción" name="descripcion" >
               <Input.TextArea placeholder="Descripción de la uva" />
             </Form.Item>
 
