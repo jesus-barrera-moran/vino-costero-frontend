@@ -144,9 +144,10 @@ const EditParcelDimensions = () => {
       if (!response.ok) {
         const errorMessage = data.message || 'Error en la respuesta del servidor';
         message.error(errorMessage);
+      } else {
+        message.success('Las dimensiones se han actualizado exitosamente');
+        navigate('/dimensions');
       }
-      message.success('Las dimensiones se han actualizado exitosamente');
-      navigate('/dimensions');
     } catch (error) {
       message.error(error.message);
     }

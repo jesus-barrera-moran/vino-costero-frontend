@@ -154,11 +154,11 @@ const CreateOrEditGrapeType = () => {
       if (!response.ok) {
         const errorMessage = data.message || 'Error en la respuesta del servidor';
         message.error(errorMessage);
+      } else {
+        const messageText = isEditMode ? 'Tipo de uva actualizado' : 'Nuevo tipo de uva registrado';
+        message.success(`${messageText} exitosamente`);
+        navigate('/grape-types');
       }
-
-      const messageText = isEditMode ? 'Tipo de uva actualizado' : 'Nuevo tipo de uva registrado';
-      message.success(`${messageText} exitosamente`);
-      navigate('/grape-types');
     } catch (error) {
       message.error(error.message);
     }

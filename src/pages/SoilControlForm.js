@@ -126,12 +126,12 @@ const RegisterSoilControl = () => {
       if (!response.ok) {
         const errorMessage = data.message || 'Error en la respuesta del servidor';
         message.error(errorMessage);
+      } else {
+        message.success('El control de tierra ha sido registrado exitosamente');
+        form.resetFields();
+        setSelectedParcela(null);
+        navigate('/soil-controls'); // Redirigir al listado de controles de tierra
       }
-
-      message.success('El control de tierra ha sido registrado exitosamente');
-      form.resetFields();
-      setSelectedParcela(null);
-      navigate('/soil-controls'); // Redirigir al listado de controles de tierra
     } catch (error) {
       message.error(error.message);
     }
