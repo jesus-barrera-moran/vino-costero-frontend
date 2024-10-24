@@ -124,15 +124,20 @@ const ParcelForm = () => {
         return;
       }
 
+      // Manejar la respuesta del servidor
+      const data = await response.json(); // Parsear la respuesta como JSON
+
       if (response.ok) {
         const messageText = isEditing ? 'La parcela ha sido actualizada exitosamente' : 'La parcela ha sido registrada exitosamente';
         message.success(messageText);
         navigate('/parcels'); // Redirige al listado principal después de guardar
       } else {
-        throw new Error('Error en la respuesta del servidor');
+        // Mostrar el mensaje de error específico del backend
+        const errorMessage = data.message || 'Error en la respuesta del servidor';
+        message.error(errorMessage);
       }
     } catch (error) {
-      message.error('Hubo un error al procesar la solicitud');
+      message.error(error.message);
     } finally {
       setLoading(false); // Desactivamos el estado de carga
     }
