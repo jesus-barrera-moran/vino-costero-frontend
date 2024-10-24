@@ -100,9 +100,12 @@ const CreateOrEditUser = () => {
 
   const onFinish = async (values) => {
     const token = localStorage.getItem('token');
+    setLoading(true); // Activamos el estado de carga
     try {
+      let response;
+  
       if (isEditMode) {
-        await axios.put(`${BACKEND_HOST}/auth/update/${username}`, {
+        response = await axios.put(`${BACKEND_HOST}/auth/update/${username}`, {
           nombre: values.nombre,
           apellido: values.apellido,
           correo: values.email,
@@ -112,7 +115,7 @@ const CreateOrEditUser = () => {
         });
         message.success('Usuario actualizado exitosamente');
       } else {
-        await axios.post(`${BACKEND_HOST}/auth/register`, {
+        response = await axios.post(`${BACKEND_HOST}/auth/register`, {
           username: values.usuario,
           password: encryptText(values.contrasena), // Encriptar la contraseña antes de enviarla
           nombre: values.nombre,
@@ -124,11 +127,17 @@ const CreateOrEditUser = () => {
         });
         message.success('Usuario registrado exitosamente');
       }
+  
       navigate('/users');
+  
     } catch (error) {
-      message.error('Error al guardar el usuario');
+      // Manejar errores específicos de Axios
+      const errorMessage = error.response?.data?.message || 'Error al guardar el usuario';
+      message.error(errorMessage); // Mostrar mensaje de error
+    } finally {
+      setLoading(false); // Desactivamos el estado de carga
     }
-  };
+  };  
 
   const validatePasswordConfirmation = ({ getFieldValue }) => ({
     validator(_, value) {
