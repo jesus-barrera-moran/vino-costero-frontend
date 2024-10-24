@@ -180,7 +180,7 @@ const CreateOrEditSowing = () => {
         body: JSON.stringify({
           id_parcela: values.parcela,
           id_tipo_uva: values.id_tipo_uva,
-          fecha_plantacion: values.fecha_plantacion.format('YYYY-MM-DD'), // Formatear la fecha
+          fecha_plantacion: values.fecha_plantacion?.format('YYYY-MM-DD'), // Formatear la fecha
           cantidad_plantas: values.cantidad_plantas,
           tecnica_siembra: values.tecnica_siembra,
           observaciones_siembra: values.observaciones_siembra || 'Sin observaciones',
