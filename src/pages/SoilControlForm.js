@@ -121,8 +121,11 @@ const RegisterSoilControl = () => {
         return;
       }
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error al registrar el control de tierra');
+        const errorMessage = data.message || 'Error en la respuesta del servidor';
+        message.error(errorMessage);
       }
 
       message.success('El control de tierra ha sido registrado exitosamente');
@@ -130,7 +133,7 @@ const RegisterSoilControl = () => {
       setSelectedParcela(null);
       navigate('/soil-controls'); // Redirigir al listado de controles de tierra
     } catch (error) {
-      message.error('Error al registrar el control de tierra.');
+      message.error(error.message);
     }
   };
 

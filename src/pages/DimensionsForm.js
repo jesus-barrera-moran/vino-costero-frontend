@@ -139,13 +139,16 @@ const EditParcelDimensions = () => {
         return;
       }
 
+      const data = await response.json(); // Parsear la respuesta como JSON
+
       if (!response.ok) {
-        throw new Error('Error al actualizar las dimensiones');
+        const errorMessage = data.message || 'Error en la respuesta del servidor';
+        message.error(errorMessage);
       }
       message.success('Las dimensiones se han actualizado exitosamente');
       navigate('/dimensions');
     } catch (error) {
-      message.error('Hubo un error al actualizar las dimensiones');
+      message.error(error.message);
     }
   };
 

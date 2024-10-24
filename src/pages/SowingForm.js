@@ -194,15 +194,18 @@ const CreateOrEditSowing = () => {
         return;
       }
 
+      const data = await response.json();
+
       if (response.ok) {
         const successMessage = isEditMode ? 'Siembra actualizada exitosamente' : 'Siembra registrada exitosamente';
         message.success(successMessage);
         navigate('/sowings'); // Redirigir al listado principal después de guardar
       } else {
-        throw new Error('Error en la respuesta del servidor');
+        const errorMessage = data.message || 'Error en la respuesta del servidor';
+        message.error(errorMessage);
       }
     } catch (error) {
-      message.error('Hubo un error al procesar la solicitud');
+      message.error(error.message);
     }
   };
 

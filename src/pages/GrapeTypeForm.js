@@ -149,15 +149,18 @@ const CreateOrEditGrapeType = () => {
         return;
       }
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error en el servidor');
+        const errorMessage = data.message || 'Error en la respuesta del servidor';
+        message.error(errorMessage);
       }
 
       const messageText = isEditMode ? 'Tipo de uva actualizado' : 'Nuevo tipo de uva registrado';
       message.success(`${messageText} exitosamente`);
       navigate('/grape-types');
     } catch (error) {
-      message.error('Error al guardar los datos.');
+      message.error(error.message);
     }
   };
 
