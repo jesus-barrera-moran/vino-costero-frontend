@@ -222,18 +222,16 @@ const EditParcelDimensions = () => {
                 <Form.Item
                   label="Superficie (hectáreas)"
                   name="superficie"
-                  rules={[{ required: true, message: 'Por favor, ingrese la superficie de la parcela' }]}
                 >
-                  <InputNumber min={0} placeholder="Superficie" style={{ width: '100%' }} />
+                  <InputNumber placeholder="Superficie" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   label="Longitud (metros)"
                   name="longitud"
-                  rules={[{ required: true, message: 'Por favor, ingrese la longitud de la parcela' }]}
                 >
-                  <InputNumber min={0} placeholder="Longitud" style={{ width: '100%' }} />
+                  <InputNumber placeholder="Longitud" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
@@ -243,18 +241,16 @@ const EditParcelDimensions = () => {
                 <Form.Item
                   label="Anchura (metros)"
                   name="anchura"
-                  rules={[{ required: true, message: 'Por favor, ingrese la anchura de la parcela' }]}
                 >
-                  <InputNumber min={0} placeholder="Anchura" style={{ width: '100%' }} />
+                  <InputNumber placeholder="Anchura" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   label="Pendiente (%)"
                   name="pendiente"
-                  rules={[{ required: true, message: 'Por favor, ingrese la pendiente de la parcela' }]}
                 >
-                  <InputNumber min={0} max={100} placeholder="Pendiente" style={{ width: '100%' }} />
+                  <InputNumber max={100} placeholder="Pendiente" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
