@@ -165,7 +165,6 @@ const RegisterSoilControl = () => {
               <Form.Item
                 label="Seleccionar Parcela"
                 name="parcela"
-                rules={[{ required: true, message: 'Por favor, seleccione una parcela' }]}
               >
                 <Select
                   placeholder="Seleccione una parcela"
@@ -211,18 +210,16 @@ const RegisterSoilControl = () => {
                 <Form.Item
                   label="PH de la Tierra"
                   name="ph"
-                  rules={[{ required: true, message: 'Por favor, ingrese el PH de la tierra' }]}
                 >
-                  <InputNumber min={0} max={14} step={0.1} placeholder="PH" style={{ width: '100%' }} />
+                  <InputNumber placeholder="PH" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
               <Col span={12}>
                 <Form.Item
                   label="Humedad (%)"
                   name="humedad"
-                  rules={[{ required: true, message: 'Por favor, ingrese el porcentaje de humedad' }]}
                 >
-                  <InputNumber min={0} max={100} placeholder="Humedad" style={{ width: '100%' }} />
+                  <InputNumber placeholder="Humedad" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
@@ -232,9 +229,8 @@ const RegisterSoilControl = () => {
                 <Form.Item
                   label="Temperatura (°C)"
                   name="temperatura"
-                  rules={[{ required: true, message: 'Por favor, ingrese la temperatura' }]}
                 >
-                  <InputNumber min={-50} max={50} placeholder="Temperatura" style={{ width: '100%' }} />
+                  <InputNumber placeholder="Temperatura" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
