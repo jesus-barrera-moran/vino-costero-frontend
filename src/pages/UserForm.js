@@ -181,7 +181,6 @@ const CreateOrEditUser = () => {
               <Form.Item
                 label="Nombre de Usuario"
                 name="usuario"
-                rules={[{ required: true, message: 'Por favor, ingrese el nombre de usuario' }]}
               >
                 <Input disabled={isEditMode} placeholder="Nombre de Usuario" />
               </Form.Item>
@@ -191,7 +190,6 @@ const CreateOrEditUser = () => {
                   <Form.Item
                     label="Nombre"
                     name="nombre"
-                    rules={[{ required: true, message: 'Por favor, ingrese el nombre del usuario' }]}
                   >
                     <Input placeholder="Nombre del Usuario" />
                   </Form.Item>
@@ -200,7 +198,6 @@ const CreateOrEditUser = () => {
                   <Form.Item
                     label="Apellido"
                     name="apellido"
-                    rules={[{ required: true, message: 'Por favor, ingrese el apellido del usuario' }]}
                   >
                     <Input placeholder="Apellido del Usuario" />
                   </Form.Item>
@@ -210,7 +207,6 @@ const CreateOrEditUser = () => {
               <Form.Item
                 label="Correo Electrónico"
                 name="email"
-                rules={[{ required: true, message: 'Por favor, ingrese el correo electrónico' }]}
               >
                 <Input placeholder="Correo Electrónico" />
               </Form.Item>
@@ -220,7 +216,6 @@ const CreateOrEditUser = () => {
                   <Form.Item
                     label="Contraseña"
                     name="contrasena"
-                    rules={[{ required: true, message: 'Por favor, ingrese una contraseña' }]}
                   >
                     <Input.Password placeholder="Contraseña" />
                   </Form.Item>
@@ -229,10 +224,6 @@ const CreateOrEditUser = () => {
                     name="confirmarContrasena"
                     dependencies={['contrasena']}
                     hasFeedback
-                    rules={[
-                      { required: true, message: 'Por favor, confirme su contraseña' },
-                      validatePasswordConfirmation,
-                    ]}
                   >
                     <Input.Password placeholder="Confirmar Contraseña" />
                   </Form.Item>
@@ -242,7 +233,6 @@ const CreateOrEditUser = () => {
               <Form.Item
                 label="Rol"
                 name="rol"
-                rules={[{ required: true, message: 'Por favor, seleccione un rol' }]}
               >
                 <Select disabled={isEditMode} placeholder="Seleccione un rol">
                   {ROLES.map((rol) => (
