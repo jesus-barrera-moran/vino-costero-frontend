@@ -231,7 +231,6 @@ const CreateOrEditSowing = () => {
             <Form.Item
               label="Seleccione Parcela"
               name="parcela"
-              rules={[{ required: true, message: 'Por favor, seleccione una parcela' }]}
             >
               <Select
                 placeholder="Seleccione una parcela"
@@ -279,7 +278,6 @@ const CreateOrEditSowing = () => {
             <Form.Item
               label="Tipo de Uva"
               name="id_tipo_uva"
-            // rules={[{ required: true, message: 'Por favor, seleccione el tipo de uva' }]}
             >
               <Select placeholder="Seleccione el tipo de uva" disabled={isEditMode} onChange={handleUvaChange}>
                 {tiposDeUva.map((uva, index) => (
@@ -311,7 +309,6 @@ const CreateOrEditSowing = () => {
                 <Form.Item
                   label="Fecha de Plantación"
                   name="fecha_plantacion"
-                  rules={[{ required: true, message: 'Por favor, seleccione la fecha de plantación' }]}
                 >
                   <DatePicker style={{ width: '100%' }} />
                 </Form.Item>
@@ -321,9 +318,8 @@ const CreateOrEditSowing = () => {
                 <Form.Item
                   label="Cantidad de Plantas"
                   name="cantidad_plantas"
-                  rules={[{ required: true, message: 'Por favor, ingrese la cantidad de plantas' }]}
                 >
-                  <InputNumber min={1} placeholder="Cantidad de Plantas" style={{ width: '100%' }} />
+                  <InputNumber placeholder="Cantidad de Plantas" style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>
@@ -334,7 +330,6 @@ const CreateOrEditSowing = () => {
                 <Form.Item
                   label="Técnica de Siembra"
                   name="tecnica_siembra"
-                  rules={[{ required: true, message: 'Por favor, ingrese la técnica de siembra utilizada' }]}
                 >
                   <Input placeholder="Técnica de Siembra (Ej: Siembra directa, Trasplante)" />
                 </Form.Item>
